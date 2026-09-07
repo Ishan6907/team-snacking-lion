@@ -1,0 +1,49 @@
+{
+  "name": "paimana-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev:frontend": "vite",
+    "dev:backend": "npm run dev --prefix backend",
+    "build:frontend": "tsc && vite build",
+    "build:backend": "npm install --prefix backend && npm run build --prefix backend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "start": "npm start --prefix backend",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/material": "^5.14.0",
+    "@mui/x-data-grid": "^6.10.0",
+    "@tanstack/react-query": "^4.35.0",
+    "axios": "^1.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.46.0",
+    "react-router-dom": "^6.16.0",
+    "react-simple-maps": "^3.0.0",
+    "recharts": "^2.8.0",
+    "topojson-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@types/topojson-client": "^3.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "@vitejs/plugin-react": "^4.0.4",
+    "eslint": "^8.48.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
+  }
+}
