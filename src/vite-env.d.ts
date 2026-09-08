@@ -8,6 +8,16 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+declare module 'react-dom/client' {
+  import type { ReactNode } from 'react';
+  export interface Root {
+    render(children: ReactNode): void;
+    unmount(): void;
+  }
+  export function createRoot(container: Element | DocumentFragment): Root;
+  export function hydrateRoot(container: Element | DocumentFragment, initialChildren: ReactNode): Root;
+}
+
 // Type declarations for packages without @types
 declare module 'react-simple-maps' {
   import type { ComponentType, CSSProperties, ReactNode } from 'react';
