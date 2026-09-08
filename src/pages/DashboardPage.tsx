@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Grid,
@@ -27,6 +27,8 @@ import {
   Legend,
 } from 'recharts';
 import ExecutiveCabinetBriefModal from '@/components/common/ExecutiveCabinetBriefModal';
+import { useRiskThresholds, calculatePortfolioMetrics } from '@/utils/thresholds';
+import { ALL_1428_PROJECTS } from '@/data/inventoryData';
 
 // Cumulative CapEx S-Curve Data (FY 2024-25 in Lakh Crores)
 const S_CURVE_DATA = [
@@ -48,6 +50,11 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [sectorFilter, setSectorFilter] = useState('All 6 Priority Sectors');
   const [briefModalOpen, setBriefModalOpen] = useState(false);
+
+  const thresholds = useRiskThresholds();
+  const riskMetrics = useMemo(() => {
+    return calculatePortfolioMetrics(ALL_1428_PROJECTS, thresholds);
+  }, [thresholds]);
 
   return (
     <Box sx={{ color: '#0f172a' }}>
@@ -162,18 +169,24 @@ export default function DashboardPage() {
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                VALUE AT SEVERE DELAY RISK
+                VALUE AT SEVERE DELAY RISK (≥{thresholds.criticalDelay}d)
               </Typography>
               <WarningAmber sx={{ fontSize: 16, color: '#ef4444' }} />
             </Stack>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#b91c1c', fontFamily: 'monospace', fontSize: '1.45rem', my: 0.4 }}>
-              ₹2,18,640 Cr
+              ₹{Math.round(riskMetrics.severeRiskCapExCr).toLocaleString('en-IN')} Cr
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
-                14.7% of monitored book
+                {riskMetrics.severeRiskPct.toFixed(1)}% of monitored book
               </Typography>
-              <Chip label="42 High-Risk Projects" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800, bgcolor: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' }} />
+              <Chip
+                label={`${riskMetrics.criticalCount} High-Risk Projects`}
+                size="small"
+                onClick={() => navigate('/inventory')}
+                sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800, bgcolor: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca', cursor: 'pointer' }}
+                title="View in Master Inventory"
+              />
             </Stack>
           </Paper>
         </Grid>
@@ -194,7 +207,7 @@ export default function DashboardPage() {
               AVG PROJECTED SCHEDULE SLIP
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#c2410c', fontFamily: 'monospace', fontSize: '1.45rem', my: 0.4 }}>
-              +118 <Typography component="span" variant="body2" sx={{ fontWeight: 700, color: '#64748b' }}>Days vs DPR</Typography>
+              +{riskMetrics.avgDelay} <Typography component="span" variant="body2" sx={{ fontWeight: 700, color: '#64748b' }}>Days vs DPR</Typography>
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>

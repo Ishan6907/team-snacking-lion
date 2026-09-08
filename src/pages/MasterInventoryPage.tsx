@@ -30,11 +30,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ALL_1428_PROJECTS, ALL_INDIAN_STATES_AND_UTS, ProjectRow } from '@/data/inventoryData';
 import CabinetEscalationDialog from '@/components/common/CabinetEscalationDialog';
 import PackageComparisonDialog from '@/components/common/PackageComparisonDialog';
+import { useRiskThresholds, calculatePortfolioMetrics } from '@/utils/thresholds';
 
 export default function MasterInventoryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const filterParam = searchParams.get('filter');
+
+  const thresholds = useRiskThresholds();
+  const globalMetrics = useMemo(() => {
+    return calculatePortfolioMetrics(ALL_1428_PROJECTS, thresholds);
+  }, [thresholds]);
 
   const [selectedIds, setSelectedIds] = useState<string[]>(['NHAI-DEL-MUM-P4']);
   const [statusFilter, setStatusFilter] = useState<'all' | 'critical' | 'moderate' | 'nominal' | 'blocked'>('all');
@@ -89,10 +95,10 @@ export default function MasterInventoryPage() {
   // Dynamic Filtering Logic
   const filteredProjects = useMemo(() => {
     return ALL_1428_PROJECTS.filter((p) => {
-      // 1. Quick status filter chips
-      if (statusFilter === 'critical' && p.predictedDelayDays < 90) return false;
-      if (statusFilter === 'moderate' && (p.predictedDelayDays < 30 || p.predictedDelayDays >= 90)) return false;
-      if (statusFilter === 'nominal' && p.predictedDelayDays > 30) return false;
+      // 1. Quick status filter chips (driven dynamically by user-configured delay thresholds)
+      if (statusFilter === 'critical' && p.predictedDelayDays < thresholds.criticalDelay) return false;
+      if (statusFilter === 'moderate' && (p.predictedDelayDays < thresholds.warningDelay || p.predictedDelayDays >= thresholds.criticalDelay)) return false;
+      if (statusFilter === 'nominal' && p.predictedDelayDays >= thresholds.warningDelay) return false;
       if (statusFilter === 'blocked' && !p.criticalBlocker.toLowerCase().includes('land') && !p.criticalBlocker.toLowerCase().includes('clearance') && !p.criticalBlocker.toLowerCase().includes('moefcc')) {
         return false;
       }
@@ -129,7 +135,7 @@ export default function MasterInventoryPage() {
       }
       return true;
     });
-  }, [statusFilter, sectorSelect, stateSelect, contractorSelect, budgetSelect, searchQuery]);
+  }, [statusFilter, sectorSelect, stateSelect, contractorSelect, budgetSelect, searchQuery, thresholds.criticalDelay, thresholds.warningDelay]);
 
   // Total pages
   const totalPages = Math.max(1, Math.ceil(filteredProjects.length / pageSize));
@@ -144,7 +150,7 @@ export default function MasterInventoryPage() {
   // Aggregate Scope Ticker Metrics
   const summaryMetrics = useMemo(() => {
     const totalOutlay = filteredProjects.reduce((sum, p) => sum + p.outlayCr, 0);
-    const criticalCount = filteredProjects.filter((p) => p.predictedDelayDays >= 90).length;
+    const criticalCount = filteredProjects.filter((p) => p.predictedDelayDays >= thresholds.criticalDelay).length;
     const avgDelay = filteredProjects.length
       ? Math.round(filteredProjects.reduce((sum, p) => sum + p.predictedDelayDays, 0) / filteredProjects.length)
       : 0;
@@ -157,7 +163,7 @@ export default function MasterInventoryPage() {
       avgDelay,
       avgProgressGap,
     };
-  }, [filteredProjects]);
+  }, [filteredProjects, thresholds.criticalDelay]);
 
   const selectedProjectObjects = useMemo(() => {
     return ALL_1428_PROJECTS.filter((p) => selectedIds.includes(p.id));
@@ -275,7 +281,7 @@ export default function MasterInventoryPage() {
   }, [page, totalPages]);
 
   const getDelayChip = (p: ProjectRow) => {
-    if (p.predictedDelayDays >= 90) {
+    if (p.predictedDelayDays >= thresholds.criticalDelay) {
       return (
         <Chip
           label={`+${p.predictedDelayDays} Days (Critical)`}
@@ -284,7 +290,7 @@ export default function MasterInventoryPage() {
         />
       );
     }
-    if (p.predictedDelayDays >= 30) {
+    if (p.predictedDelayDays >= thresholds.warningDelay) {
       return (
         <Chip
           label={`+${p.predictedDelayDays} Days (Moderate)`}
@@ -295,7 +301,7 @@ export default function MasterInventoryPage() {
     }
     return (
       <Chip
-        label="+0 Days (Nominal)"
+        label={`+${p.predictedDelayDays} Days (Nominal)`}
         size="small"
         sx={{ height: 20, fontSize: '0.62rem', fontWeight: 800, bgcolor: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}
       />
@@ -383,7 +389,7 @@ export default function MasterInventoryPage() {
           }}
         />
         <Chip
-          label="● Critical Delay >90d (186)"
+          label={`● Critical Delay ≥${thresholds.criticalDelay}d (${globalMetrics.criticalCount})`}
           size="small"
           onClick={() => handleStatusFilterChange('critical')}
           sx={{
@@ -397,7 +403,7 @@ export default function MasterInventoryPage() {
           }}
         />
         <Chip
-          label="● Moderate Risk 31-90d (428)"
+          label={`● Moderate Risk ${thresholds.warningDelay}–${thresholds.criticalDelay - 1}d (${globalMetrics.warningCount})`}
           size="small"
           onClick={() => handleStatusFilterChange('moderate')}
           sx={{
@@ -411,7 +417,7 @@ export default function MasterInventoryPage() {
           }}
         />
         <Chip
-          label="● On-Schedule (814)"
+          label={`● On-Schedule (<${thresholds.warningDelay}d) (${globalMetrics.nominalCount})`}
           size="small"
           onClick={() => handleStatusFilterChange('nominal')}
           sx={{
@@ -539,7 +545,7 @@ export default function MasterInventoryPage() {
             FILTERED SCOPE CAPEX: <strong style={{ color: '#0f172a' }}>₹{Math.round(summaryMetrics.totalOutlay).toLocaleString('en-IN')} Cr</strong>
           </Typography>
           <Typography variant="caption" sx={{ color: '#dc2626', fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 700 }}>
-            CRITICAL BLOCKERS: {summaryMetrics.criticalCount} Packages (&gt;90d)
+            CRITICAL BLOCKERS: {summaryMetrics.criticalCount} Packages (≥{thresholds.criticalDelay}d)
           </Typography>
           <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem', fontFamily: 'monospace' }}>
             AVG FORECAST VARIANCE: <strong style={{ color: '#d97706' }}>+{summaryMetrics.avgDelay} Days</strong>

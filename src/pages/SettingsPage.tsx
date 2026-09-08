@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -29,6 +29,8 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { apiClient } from '@/api/client';
 import LossSplittingInspector from '@/components/ml/LossSplittingInspector';
+import { getStoredThresholds, saveStoredThresholds, calculatePortfolioMetrics } from '@/utils/thresholds';
+import { ALL_1428_PROJECTS } from '@/data/inventoryData';
 
 export default function SettingsPage() {
   const { user, changePassword, updateProfile } = useAuth();
@@ -50,13 +52,25 @@ export default function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // Problem statement / ML threshold parameters
-  const [criticalDelayThreshold, setCriticalDelayThreshold] = useState<number>(180);
-  const [warningDelayThreshold, setWarningDelayThreshold] = useState<number>(60);
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [autoRecompute, setAutoRecompute] = useState(true);
-  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(75);
+  // Problem statement / ML threshold parameters (hydrated from localStorage)
+  const initialThresholds = useMemo(() => getStoredThresholds(), []);
+  const [criticalDelayThreshold, setCriticalDelayThreshold] = useState<number>(initialThresholds.criticalDelay);
+  const [warningDelayThreshold, setWarningDelayThreshold] = useState<number>(initialThresholds.warningDelay);
+  const [emailAlerts, setEmailAlerts] = useState<boolean>(initialThresholds.emailAlerts);
+  const [autoRecompute, setAutoRecompute] = useState<boolean>(initialThresholds.autoRecompute);
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(initialThresholds.confidenceCutoff);
   const [modelSuccess, setModelSuccess] = useState('');
+
+  // Real-time live metrics calculated against active slider settings
+  const liveMetrics = useMemo(() => {
+    return calculatePortfolioMetrics(ALL_1428_PROJECTS, {
+      criticalDelay: criticalDelayThreshold,
+      warningDelay: warningDelayThreshold,
+      confidenceCutoff: confidenceThreshold,
+      emailAlerts,
+      autoRecompute,
+    });
+  }, [criticalDelayThreshold, warningDelayThreshold, confidenceThreshold, emailAlerts, autoRecompute]);
 
   // Report download state
   const [downloadingReport, setDownloadingReport] = useState(false);
@@ -462,18 +476,102 @@ export default function SettingsPage() {
                 </Grid>
               </Grid>
 
-              <Box sx={{ mt: 3.5 }}>
+              {/* LIVE PORTFOLIO IMPACT PREVIEW CARD */}
+              <Paper
+                elevation={0}
+                sx={{
+                  mt: 3,
+                  p: 2.5,
+                  borderRadius: 1,
+                  border: '1px solid #cbd5e1',
+                  bgcolor: '#ffffff',
+                }}
+              >
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={800} color="#0f172a">
+                      Live Portfolio Impact Preview (1,428 Central Sector Projects)
+                    </Typography>
+                    <Typography variant="caption" color="#64748b">
+                      Parametric effect of current slider positions before & after persistent storage
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label="Active Telemetry"
+                    size="small"
+                    sx={{ height: 20, fontSize: '0.62rem', fontWeight: 800, bgcolor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' }}
+                  />
+                </Stack>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ p: 1.5, bgcolor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                        CRITICAL ESCALATION (≥{criticalDelayThreshold}d)
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 900, color: '#b91c1c', fontFamily: 'monospace', my: 0.2 }}>
+                        {liveMetrics.criticalCount} Projects
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#991b1b', fontSize: '0.68rem', fontWeight: 600 }}>
+                        ₹{Math.round(liveMetrics.severeRiskCapExCr).toLocaleString('en-IN')} Cr ({liveMetrics.severeRiskPct.toFixed(1)}% CapEx)
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ p: 1.5, bgcolor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                        WARNING WATCHLIST ({warningDelayThreshold}–{criticalDelayThreshold - 1}d)
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 900, color: '#d97706', fontFamily: 'monospace', my: 0.2 }}>
+                        {liveMetrics.warningCount} Projects
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#92400e', fontSize: '0.68rem', fontWeight: 600 }}>
+                        Pre-emptive mitigation triggers
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ p: 1.5, bgcolor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ color: '#15803d', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                        NOMINAL / ON-SCHEDULE (&lt;{warningDelayThreshold}d)
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 900, color: '#15803d', fontFamily: 'monospace', my: 0.2 }}>
+                        {liveMetrics.nominalCount} Projects
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#166534', fontSize: '0.68rem', fontWeight: 600 }}>
+                        Within DPR variance tolerance
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Paper>
+
+              <Box sx={{ mt: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"
                   startIcon={<SaveIcon fontSize="small" />}
                   onClick={() => {
-                    setModelSuccess('Analytical parameters and delay thresholds saved.');
-                    setTimeout(() => setModelSuccess(''), 3000);
+                    saveStoredThresholds({
+                      criticalDelay: criticalDelayThreshold,
+                      warningDelay: warningDelayThreshold,
+                      confidenceCutoff: confidenceThreshold,
+                      emailAlerts,
+                      autoRecompute,
+                    });
+                    setModelSuccess(
+                      `Thresholds saved & synchronized! Across 1,428 central projects: ${liveMetrics.criticalCount} projects flagged CRITICAL (≥${criticalDelayThreshold}d delay, ₹${Math.round(liveMetrics.severeRiskCapExCr).toLocaleString('en-IN')} Cr risk), ${liveMetrics.warningCount} projects flagged WARNING (${warningDelayThreshold}–${criticalDelayThreshold - 1}d). System-wide telemetry updated.`
+                    );
+                    setTimeout(() => setModelSuccess(''), 7000);
                   }}
                   sx={{ borderRadius: 1, px: 3, bgcolor: '#0b2545', color: '#ffffff', fontWeight: 800, '&:hover': { bgcolor: '#06172b' } }}
                 >
                   Apply Delay Rules
                 </Button>
+                <Typography variant="caption" color="#64748b">
+                  Settings are immediately saved to browser storage and dispatched system-wide across Dashboard, Ribbon &amp; Inventory.
+                </Typography>
               </Box>
             </Box>
           )}

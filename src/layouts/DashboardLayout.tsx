@@ -43,6 +43,7 @@ import CommandPaletteModal from '@/components/common/CommandPaletteModal';
 import { isMoEFCCForestProject } from '@/pages/ForestClearancePage';
 import { ALL_1428_PROJECTS } from '@/data/inventoryData';
 import { useUnreadAlertCount } from '@/hooks/useAlerts';
+import { useRiskThresholds, calculatePortfolioMetrics } from '@/utils/thresholds';
 
 const DRAWER_WIDTH = 250;
 
@@ -61,6 +62,11 @@ export default function DashboardLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const thresholds = useRiskThresholds();
+  const portfolioMetrics = useMemo(() => {
+    return calculatePortfolioMetrics(ALL_1428_PROJECTS, thresholds);
+  }, [thresholds]);
 
   // Dynamic badge counts
   const moefccCount = useMemo(() => ALL_1428_PROJECTS.filter(isMoEFCCForestProject).length, []);
@@ -534,12 +540,17 @@ export default function DashboardLayout() {
               CAPEX: <strong style={{ color: '#0f172a' }}>₹14.82L Cr</strong>
             </Typography>
             <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', borderColor: '#cbd5e1' }} />
-            <Typography variant="caption" sx={{ color: '#b91c1c', fontSize: '0.68rem', fontFamily: 'monospace' }}>
-              CRITICAL DELAYS: <strong>42</strong>
+            <Typography
+              variant="caption"
+              onClick={() => navigate('/settings')}
+              sx={{ color: '#b91c1c', fontSize: '0.68rem', fontFamily: 'monospace', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+              title={`Flagged at ≥${thresholds.criticalDelay} days delay. Click to configure threshold.`}
+            >
+              CRITICAL DELAYS (≥{thresholds.criticalDelay}d): <strong>{portfolioMetrics.criticalCount}</strong>
             </Typography>
             <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', borderColor: '#cbd5e1' }} />
             <Typography variant="caption" sx={{ color: '#c2410c', fontSize: '0.68rem', fontFamily: 'monospace' }}>
-              AVG OVERRUN: <strong>+118d</strong>
+              AVG OVERRUN: <strong>+{portfolioMetrics.avgDelay}d</strong>
             </Typography>
             <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', borderColor: '#cbd5e1' }} />
             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem', fontFamily: 'monospace' }}>
