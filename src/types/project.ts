@@ -2,6 +2,15 @@ export type ProjectStatus = 'on_track' | 'at_risk' | 'delayed' | 'completed' | '
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
+export interface ProjectCriticalIssue {
+  code: string;
+  title: string;
+  authority: string;
+  severity: 'critical' | 'high' | 'medium';
+  status: 'pending_cabinet' | 'under_litigation' | 'inter_ministerial' | 'resolved';
+  escalationDate: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -18,8 +27,18 @@ export interface Project {
   status: ProjectStatus;
   riskLevel: RiskLevel;
   delayDays: number;
+  predictedDelay?: number;
   contractor?: string;
   implementingAgency: string;
+  // Authentic MoSPI & Enterprise Fields:
+  mospiCode?: string;
+  originalCostCr?: number;
+  revisedCostCr?: number;
+  costOverrunCr?: number;
+  primaryBottleneck?: string;
+  clearanceMilestone?: string;
+  cabinetNoteRef?: string;
+  criticalIssues?: ProjectCriticalIssue[];
 }
 
 export interface ProjectListItem {
@@ -32,6 +51,16 @@ export interface ProjectListItem {
   physicalProgress: number;
   delayDays: number;
   predictedDelay: number;
+  // Authentic MoSPI & Enterprise Fields:
+  mospiCode?: string;
+  originalCostCr?: number;
+  revisedCostCr?: number;
+  costOverrunCr?: number;
+  primaryBottleneck?: string;
+  contractor?: string;
+  implementingAgency?: string;
+  clearanceMilestone?: string;
+  cabinetNoteRef?: string;
 }
 
 export interface ProjectFilters {

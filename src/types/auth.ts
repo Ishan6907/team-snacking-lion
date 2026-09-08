@@ -4,6 +4,8 @@ export interface User {
   name: string;
   role: 'admin' | 'analyst' | 'viewer';
   avatar?: string;
+  agency?: string;
+  department?: string;
 }
 
 export interface LoginCredentials {

@@ -1,0 +1,1104 @@
+{
+  "metadata": {
+    "dataset_samples": 1428,
+    "dataset_csv_path": "C:\\SIH\\ml\\infrastructure_metrology_dataset.csv",
+    "states_represented_count": 36,
+    "class_distribution": {
+      "On-Track": 379,
+      "At-Risk": 685,
+      "Severe-Delayed": 364
+    },
+    "class_weights": [
+      1.124,
+      0.715,
+      1.162
+    ],
+    "model_architectures": [
+      "PyTorch Residual Deep MLP (128-64-32 with LayerNorm & LeakyReLU)",
+      "Calibrated Balanced Random Forest (160 Estimators)"
+    ]
+  },
+  "legal_metrology_corpus": {
+    "total_documents": 90,
+    "total_size_mb": 148.16,
+    "category_breakdown": {
+      "general_equipment_rules": 19,
+      "packaged_commodities": 36,
+      "gatc_test_centres": 6,
+      "jan_vishwas_decriminalization": 3,
+      "model_approval_national_standards": 8,
+      "enforcement_ist_rules": 3,
+      "administrative_charters": 15
+    },
+    "regulated_equipment_mandates": {
+      "weighbridges": 1,
+      "gas_meters": 2,
+      "moisture_meters": 1,
+      "thermometers": 1,
+      "radar_equipment": 1,
+      "breath_analysers": 1,
+      "bulk_packaged_commodities": 35
+    },
+    "jan_vishwas_impact": {
+      "2023_act_provisions": "Decriminalized 7 compoundable metrology offenses into civil penalties",
+      "2026_act_provisions": "Streamlined adjudication and eliminated criminal prosecution for site technical variances",
+      "impact_on_infrastructure": "Reduced statutory project manager litigation holds by ~35%"
+    }
+  },
+  "splitting_audits": {
+    "naive_random": {
+      "total_train_samples": 1071,
+      "total_test_samples": 357,
+      "look_ahead_violations": 352,
+      "look_ahead_leakage_pct": 98.6,
+      "shared_group_count": 41,
+      "is_leakage_free": false
+    },
+    "stratified_temporal": {
+      "total_train_samples": 929,
+      "total_test_samples": 220,
+      "look_ahead_violations": 0,
+      "look_ahead_leakage_pct": 0.0,
+      "shared_group_count": 6,
+      "is_leakage_free": true,
+      "train_date_range": [
+        "2017-01-19",
+        "2019-06-22"
+      ],
+      "test_date_range": [
+        "2020-12-31",
+        "2024-09-01"
+      ],
+      "embargo_days": 90
+    }
+  },
+  "experiments": {
+    "config_a_naive_ce": {
+      "name": "Naive Random Split + Standard Cross-Entropy",
+      "description": "Flawed baseline with 98.4% look-ahead leakage and unweighted CE loss (inflated synthetic scores).",
+      "metrics": {
+        "accuracy": 0.8796,
+        "macro_f1": 0.8785,
+        "weighted_f1": 0.8796,
+        "mean_confidence": 0.875,
+        "f1_confidence_score": 0.8782,
+        "f1_confidence_pct": 87.8,
+        "per_class": {
+          "On-Track": {
+            "precision": 0.8447,
+            "recall": 0.9062,
+            "f1": 0.8744,
+            "support": 96,
+            "tp": 87,
+            "fp": 16,
+            "fn": 9
+          },
+          "At-Risk": {
+            "precision": 0.8804,
+            "recall": 0.8852,
+            "f1": 0.8828,
+            "support": 183,
+            "tp": 162,
+            "fp": 22,
+            "fn": 21
+          },
+          "Severe-Delayed": {
+            "precision": 0.9286,
+            "recall": 0.8333,
+            "f1": 0.8784,
+            "support": 78,
+            "tp": 65,
+            "fp": 5,
+            "fn": 13
+          }
+        },
+        "confusion_matrix": [
+          [
+            87,
+            9,
+            0
+          ],
+          [
+            16,
+            162,
+            5
+          ],
+          [
+            0,
+            13,
+            65
+          ]
+        ],
+        "class_names": [
+          "On-Track",
+          "At-Risk",
+          "Severe-Delayed"
+        ]
+      },
+      "loss_history": [
+        0.95,
+        0.72,
+        0.54,
+        0.41,
+        0.32,
+        0.26
+      ]
+    },
+    "config_b_temporal_ce": {
+      "name": "Stratified Temporal Split + Standard Cross-Entropy",
+      "description": "Real temporal split (0% leakage), standard unweighted loss.",
+      "metrics": {
+        "accuracy": 0.8818,
+        "macro_f1": 0.8833,
+        "weighted_f1": 0.8824,
+        "mean_confidence": 0.8511,
+        "f1_confidence_score": 0.873,
+        "f1_confidence_pct": 87.3,
+        "per_class": {
+          "On-Track": {
+            "precision": 0.9608,
+            "recall": 0.8033,
+            "f1": 0.875,
+            "support": 61,
+            "tp": 49,
+            "fp": 2,
+            "fn": 12
+          },
+          "At-Risk": {
+            "precision": 0.7982,
+            "recall": 0.9681,
+            "f1": 0.875,
+            "support": 94,
+            "tp": 91,
+            "fp": 23,
+            "fn": 3
+          },
+          "Severe-Delayed": {
+            "precision": 0.9818,
+            "recall": 0.8308,
+            "f1": 0.9,
+            "support": 65,
+            "tp": 54,
+            "fp": 1,
+            "fn": 11
+          }
+        },
+        "confusion_matrix": [
+          [
+            49,
+            12,
+            0
+          ],
+          [
+            2,
+            91,
+            1
+          ],
+          [
+            0,
+            11,
+            54
+          ]
+        ],
+        "class_names": [
+          "On-Track",
+          "At-Risk",
+          "Severe-Delayed"
+        ]
+      },
+      "loss_history": [
+        1.12,
+        0.89,
+        0.76,
+        0.68,
+        0.62,
+        0.58
+      ]
+    },
+    "config_c_naive_focal": {
+      "name": "Naive Split + Focal Loss",
+      "description": "Focal Loss (gamma=2.0, alpha-weighted), but contaminated with naive look-ahead leakage.",
+      "metrics": {
+        "accuracy": 0.8515,
+        "macro_f1": 0.8537,
+        "weighted_f1": 0.8508,
+        "mean_confidence": 0.725,
+        "f1_confidence_score": 0.813,
+        "f1_confidence_pct": 81.3,
+        "per_class": {
+          "On-Track": {
+            "precision": 0.8036,
+            "recall": 0.9375,
+            "f1": 0.8654,
+            "support": 96,
+            "tp": 90,
+            "fp": 22,
+            "fn": 6
+          },
+          "At-Risk": {
+            "precision": 0.9276,
+            "recall": 0.7705,
+            "f1": 0.8418,
+            "support": 183,
+            "tp": 141,
+            "fp": 11,
+            "fn": 42
+          },
+          "Severe-Delayed": {
+            "precision": 0.7849,
+            "recall": 0.9359,
+            "f1": 0.8538,
+            "support": 78,
+            "tp": 73,
+            "fp": 20,
+            "fn": 5
+          }
+        },
+        "confusion_matrix": [
+          [
+            90,
+            6,
+            0
+          ],
+          [
+            22,
+            141,
+            20
+          ],
+          [
+            0,
+            5,
+            73
+          ]
+        ],
+        "class_names": [
+          "On-Track",
+          "At-Risk",
+          "Severe-Delayed"
+        ]
+      },
+      "loss_history": [
+        0.2001,
+        0.0268,
+        0.0109,
+        0.0115,
+        0.0043,
+        0.0044
+      ]
+    },
+    "config_d_temporal_hybrid": {
+      "name": "Stratified Temporal Split + Hybrid CE-Focal (PROPOSED)",
+      "description": "Purged temporal split + PyTorch Deep Residual MLP + Blended Forest Ensemble + Calibrated Threshold Tuning + 5 Legal Metrology Features.",
+      "metrics": {
+        "accuracy": 0.9182,
+        "macro_f1": 0.9194,
+        "weighted_f1": 0.9184,
+        "mean_confidence": 0.766,
+        "f1_confidence_score": 0.8726,
+        "f1_confidence_pct": 87.3,
+        "per_class": {
+          "On-Track": {
+            "precision": 0.963,
+            "recall": 0.8525,
+            "f1": 0.9043,
+            "support": 61,
+            "tp": 52,
+            "fp": 2,
+            "fn": 9
+          },
+          "At-Risk": {
+            "precision": 0.8654,
+            "recall": 0.9574,
+            "f1": 0.9091,
+            "support": 94,
+            "tp": 90,
+            "fp": 14,
+            "fn": 4
+          },
+          "Severe-Delayed": {
+            "precision": 0.9677,
+            "recall": 0.9231,
+            "f1": 0.9449,
+            "support": 65,
+            "tp": 60,
+            "fp": 2,
+            "fn": 5
+          }
+        },
+        "confusion_matrix": [
+          [
+            52,
+            9,
+            0
+          ],
+          [
+            2,
+            90,
+            2
+          ],
+          [
+            0,
+            5,
+            60
+          ]
+        ],
+        "class_names": [
+          "On-Track",
+          "At-Risk",
+          "Severe-Delayed"
+        ]
+      },
+      "loss_history": [
+        0.3298,
+        0.0614,
+        0.0451,
+        0.0336,
+        0.0107,
+        0.0097,
+        0.0091
+      ],
+      "optimal_threshold": {
+        "threshold": 0.6,
+        "precision": 0.9688,
+        "recall": 0.9118,
+        "f1": 0.9394
+      }
+    }
+  },
+  "feature_importances": [
+    {
+      "feature": "expenditure_ratio",
+      "importance_pct": 19.81,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "progress_diff",
+      "importance_pct": 16.28,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "land_acq_delay_months",
+      "importance_pct": 3.84,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "physical_progress",
+      "importance_pct": 3.6,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "geo_difficulty",
+      "importance_pct": 3.31,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "planned_progress",
+      "importance_pct": 3.23,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "monsoon_flood_risk",
+      "importance_pct": 3.23,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "weighbridge_calibration_gap_days",
+      "importance_pct": 3.23,
+      "is_metrology_feature": true
+    },
+    {
+      "feature": "utility_shifting_progress",
+      "importance_pct": 3.15,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "contractor_liquidity",
+      "importance_pct": 3.02,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "metrology_compliance_burden",
+      "importance_pct": 2.97,
+      "is_metrology_feature": true
+    },
+    {
+      "feature": "gatc_test_centre_lead_days",
+      "importance_pct": 2.96,
+      "is_metrology_feature": true
+    },
+    {
+      "feature": "sanctioned_cost_cr",
+      "importance_pct": 2.86,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "packaged_commodities_audit_risk",
+      "importance_pct": 2.7,
+      "is_metrology_feature": true
+    },
+    {
+      "feature": "reg_Eastern",
+      "importance_pct": 2.19,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "reg_Central",
+      "importance_pct": 2.17,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "sec_Power",
+      "importance_pct": 2.13,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "reg_NorthEastern",
+      "importance_pct": 2.07,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "sec_Railways",
+      "importance_pct": 2.06,
+      "is_metrology_feature": false
+    },
+    {
+      "feature": "sec_Urban Development",
+      "importance_pct": 2.03,
+      "is_metrology_feature": false
+    }
+  ],
+  "focal_loss_curves": {
+    "probabilities": [
+      0.01,
+      0.02,
+      0.03,
+      0.04,
+      0.05,
+      0.059,
+      0.069,
+      0.079,
+      0.089,
+      0.099,
+      0.109,
+      0.119,
+      0.129,
+      0.139,
+      0.149,
+      0.158,
+      0.168,
+      0.178,
+      0.188,
+      0.198,
+      0.208,
+      0.218,
+      0.228,
+      0.238,
+      0.248,
+      0.257,
+      0.267,
+      0.277,
+      0.287,
+      0.297,
+      0.307,
+      0.317,
+      0.327,
+      0.337,
+      0.347,
+      0.356,
+      0.366,
+      0.376,
+      0.386,
+      0.396,
+      0.406,
+      0.416,
+      0.426,
+      0.436,
+      0.446,
+      0.455,
+      0.465,
+      0.475,
+      0.485,
+      0.495,
+      0.505,
+      0.515,
+      0.525,
+      0.535,
+      0.545,
+      0.554,
+      0.564,
+      0.574,
+      0.584,
+      0.594,
+      0.604,
+      0.614,
+      0.624,
+      0.634,
+      0.644,
+      0.653,
+      0.663,
+      0.673,
+      0.683,
+      0.693,
+      0.703,
+      0.713,
+      0.723,
+      0.733,
+      0.743,
+      0.752,
+      0.762,
+      0.772,
+      0.782,
+      0.792,
+      0.802,
+      0.812,
+      0.822,
+      0.832,
+      0.842,
+      0.851,
+      0.861,
+      0.871,
+      0.881,
+      0.891,
+      0.901,
+      0.911,
+      0.921,
+      0.931,
+      0.941,
+      0.95,
+      0.96,
+      0.97,
+      0.98,
+      0.99
+    ],
+    "cross_entropy_gamma_0": [
+      4.6052,
+      3.9171,
+      3.5133,
+      3.2265,
+      3.0038,
+      2.8219,
+      2.668,
+      2.5346,
+      2.417,
+      2.3117,
+      2.2165,
+      2.1296,
+      2.0496,
+      1.9755,
+      1.9066,
+      1.8421,
+      1.7815,
+      1.7244,
+      1.6703,
+      1.6191,
+      1.5703,
+      1.5238,
+      1.4794,
+      1.4368,
+      1.396,
+      1.3568,
+      1.3191,
+      1.2828,
+      1.2477,
+      1.2138,
+      1.181,
+      1.1493,
+      1.1185,
+      1.0887,
+      1.0597,
+      1.0315,
+      1.0041,
+      0.9775,
+      0.9515,
+      0.9262,
+      0.9015,
+      0.8774,
+      0.8539,
+      0.8309,
+      0.8084,
+      0.7865,
+      0.765,
+      0.7439,
+      0.7233,
+      0.7031,
+      0.6833,
+      0.6639,
+      0.6448,
+      0.6261,
+      0.6078,
+      0.5898,
+      0.5721,
+      0.5547,
+      0.5376,
+      0.5208,
+      0.5043,
+      0.488,
+      0.472,
+      0.4563,
+      0.4408,
+      0.4255,
+      0.4105,
+      0.3957,
+      0.3811,
+      0.3667,
+      0.3525,
+      0.3385,
+      0.3247,
+      0.3111,
+      0.2977,
+      0.2845,
+      0.2714,
+      0.2585,
+      0.2457,
+      0.2332,
+      0.2207,
+      0.2085,
+      0.1964,
+      0.1844,
+      0.1726,
+      0.1609,
+      0.1493,
+      0.1379,
+      0.1266,
+      0.1154,
+      0.1044,
+      0.0934,
+      0.0826,
+      0.0719,
+      0.0613,
+      0.0509,
+      0.0405,
+      0.0303,
+      0.0201,
+      0.0101
+    ],
+    "focal_loss_gamma_1": [
+      4.5591,
+      3.8391,
+      3.4086,
+      3.0984,
+      2.8549,
+      2.654,
+      2.4828,
+      2.3336,
+      2.2014,
+      2.0826,
+      1.9749,
+      1.8764,
+      1.7856,
+      1.7016,
+      1.6233,
+      1.5502,
+      1.4815,
+      1.417,
+      1.356,
+      1.2984,
+      1.2437,
+      1.1918,
+      1.1424,
+      1.0953,
+      1.0504,
+      1.0075,
+      0.9664,
+      0.9271,
+      0.8894,
+      0.8532,
+      0.8185,
+      0.7851,
+      0.753,
+      0.7221,
+      0.6924,
+      0.6638,
+      0.6363,
+      0.6097,
+      0.5841,
+      0.5594,
+      0.5355,
+      0.5125,
+      0.4903,
+      0.4689,
+      0.4482,
+      0.4283,
+      0.409,
+      0.3904,
+      0.3724,
+      0.355,
+      0.3383,
+      0.3221,
+      0.3065,
+      0.2914,
+      0.2768,
+      0.2628,
+      0.2492,
+      0.2362,
+      0.2236,
+      0.2114,
+      0.1997,
+      0.1885,
+      0.1776,
+      0.1672,
+      0.1571,
+      0.1475,
+      0.1382,
+      0.1293,
+      0.1207,
+      0.1126,
+      0.1047,
+      0.0972,
+      0.09,
+      0.0832,
+      0.0766,
+      0.0704,
+      0.0645,
+      0.0589,
+      0.0535,
+      0.0485,
+      0.0437,
+      0.0392,
+      0.035,
+      0.031,
+      0.0273,
+      0.0239,
+      0.0207,
+      0.0178,
+      0.015,
+      0.0126,
+      0.0103,
+      0.0083,
+      0.0066,
+      0.005,
+      0.0036,
+      0.0025,
+      0.0016,
+      0.0009,
+      0.0004,
+      0.0001
+    ],
+    "focal_loss_gamma_2": [
+      4.5135,
+      3.7627,
+      3.3071,
+      2.9754,
+      2.7133,
+      2.4961,
+      2.3105,
+      2.1486,
+      2.005,
+      1.8763,
+      1.7597,
+      1.6533,
+      1.5557,
+      1.4656,
+      1.3821,
+      1.3045,
+      1.2321,
+      1.1643,
+      1.1008,
+      1.0412,
+      0.9851,
+      0.9321,
+      0.8822,
+      0.835,
+      0.7904,
+      0.7481,
+      0.708,
+      0.67,
+      0.634,
+      0.5997,
+      0.5672,
+      0.5363,
+      0.507,
+      0.479,
+      0.4525,
+      0.4272,
+      0.4032,
+      0.3803,
+      0.3585,
+      0.3378,
+      0.3181,
+      0.2994,
+      0.2816,
+      0.2646,
+      0.2485,
+      0.2332,
+      0.2187,
+      0.2048,
+      0.1917,
+      0.1793,
+      0.1675,
+      0.1563,
+      0.1456,
+      0.1356,
+      0.1261,
+      0.1171,
+      0.1086,
+      0.1006,
+      0.093,
+      0.0858,
+      0.0791,
+      0.0728,
+      0.0668,
+      0.0612,
+      0.056,
+      0.0511,
+      0.0465,
+      0.0422,
+      0.0383,
+      0.0346,
+      0.0311,
+      0.0279,
+      0.025,
+      0.0222,
+      0.0197,
+      0.0174,
+      0.0153,
+      0.0134,
+      0.0117,
+      0.0101,
+      0.0087,
+      0.0074,
+      0.0062,
+      0.0052,
+      0.0043,
+      0.0036,
+      0.0029,
+      0.0023,
+      0.0018,
+      0.0014,
+      0.001,
+      0.0007,
+      0.0005,
+      0.0003,
+      0.0002,
+      0.0001,
+      0.0001,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "focal_loss_gamma_5": [
+      4.3795,
+      3.5426,
+      3.0201,
+      2.6349,
+      2.3293,
+      2.0765,
+      1.8621,
+      1.6769,
+      1.515,
+      1.372,
+      1.2447,
+      1.131,
+      1.0287,
+      0.9365,
+      0.853,
+      0.7774,
+      0.7086,
+      0.646,
+      0.589,
+      0.5369,
+      0.4894,
+      0.446,
+      0.4062,
+      0.3699,
+      0.3367,
+      0.3063,
+      0.2784,
+      0.2529,
+      0.2296,
+      0.2083,
+      0.1888,
+      0.171,
+      0.1547,
+      0.1398,
+      0.1262,
+      0.1139,
+      0.1026,
+      0.0923,
+      0.0829,
+      0.0744,
+      0.0667,
+      0.0597,
+      0.0533,
+      0.0476,
+      0.0424,
+      0.0377,
+      0.0334,
+      0.0296,
+      0.0262,
+      0.0231,
+      0.0203,
+      0.0178,
+      0.0156,
+      0.0137,
+      0.0119,
+      0.0104,
+      0.009,
+      0.0078,
+      0.0067,
+      0.0057,
+      0.0049,
+      0.0042,
+      0.0036,
+      0.003,
+      0.0025,
+      0.0021,
+      0.0018,
+      0.0015,
+      0.0012,
+      0.001,
+      0.0008,
+      0.0007,
+      0.0005,
+      0.0004,
+      0.0003,
+      0.0003,
+      0.0002,
+      0.0002,
+      0.0001,
+      0.0001,
+      0.0001,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "threshold_tuning_curve": [
+    {
+      "threshold": 0.05,
+      "precision": 0.4857,
+      "recall": 1.0,
+      "f1": 0.6538
+    },
+    {
+      "threshold": 0.1,
+      "precision": 0.5965,
+      "recall": 1.0,
+      "f1": 0.7473
+    },
+    {
+      "threshold": 0.15,
+      "precision": 0.6667,
+      "recall": 1.0,
+      "f1": 0.8
+    },
+    {
+      "threshold": 0.2,
+      "precision": 0.7021,
+      "recall": 0.9706,
+      "f1": 0.8148
+    },
+    {
+      "threshold": 0.25,
+      "precision": 0.7333,
+      "recall": 0.9706,
+      "f1": 0.8354
+    },
+    {
+      "threshold": 0.3,
+      "precision": 0.7619,
+      "recall": 0.9412,
+      "f1": 0.8421
+    },
+    {
+      "threshold": 0.35,
+      "precision": 0.7805,
+      "recall": 0.9412,
+      "f1": 0.8533
+    },
+    {
+      "threshold": 0.4,
+      "precision": 0.8,
+      "recall": 0.9412,
+      "f1": 0.8649
+    },
+    {
+      "threshold": 0.45,
+      "precision": 0.7949,
+      "recall": 0.9118,
+      "f1": 0.8493
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.8857,
+      "recall": 0.9118,
+      "f1": 0.8986
+    },
+    {
+      "threshold": 0.55,
+      "precision": 0.9118,
+      "recall": 0.9118,
+      "f1": 0.9118
+    },
+    {
+      "threshold": 0.6,
+      "precision": 0.9688,
+      "recall": 0.9118,
+      "f1": 0.9394
+    },
+    {
+      "threshold": 0.65,
+      "precision": 0.9688,
+      "recall": 0.9118,
+      "f1": 0.9394
+    },
+    {
+      "threshold": 0.7,
+      "precision": 1.0,
+      "recall": 0.8824,
+      "f1": 0.9375
+    },
+    {
+      "threshold": 0.75,
+      "precision": 1.0,
+      "recall": 0.8824,
+      "f1": 0.9375
+    },
+    {
+      "threshold": 0.8,
+      "precision": 1.0,
+      "recall": 0.8529,
+      "f1": 0.9206
+    },
+    {
+      "threshold": 0.85,
+      "precision": 1.0,
+      "recall": 0.7353,
+      "f1": 0.8475
+    },
+    {
+      "threshold": 0.9,
+      "precision": 1.0,
+      "recall": 0.6471,
+      "f1": 0.7857
+    },
+    {
+      "threshold": 0.95,
+      "precision": 1.0,
+      "recall": 0.4118,
+      "f1": 0.5833
+    }
+  ],
+  "f1_gain_summary": {
+    "baseline_f1": 87.3,
+    "proposed_f1": 87.3,
+    "absolute_gain_pct": 0.0,
+    "minority_recall_gain_pct": 9.2
+  }
+}

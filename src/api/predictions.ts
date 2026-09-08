@@ -25,6 +25,8 @@ export const predictionsApi = {
     totalProjects: number;
     atRiskCount: number;
     avgPredictedDelay: number;
+    totalSanctionedCr?: number;
+    totalOverrunCr?: number;
     delayDistribution: { bucket: string; count: number }[];
     sectorBreakdown: { sector: string; avgDelay: number; projectCount: number }[];
   }> => {

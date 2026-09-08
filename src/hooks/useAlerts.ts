@@ -27,3 +27,14 @@ export function useMarkAlertRead() {
     },
   });
 }
+
+export function useMarkAllAlertsRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => alertsApi.markAllAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts-unread-count'] });
+    },
+  });
+}

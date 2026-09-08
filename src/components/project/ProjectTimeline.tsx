@@ -19,14 +19,14 @@ export default function ProjectTimeline({ project }: ProjectTimelineProps) {
   const events: TimelineEvent[] = [
     {
       date: project.startDate,
-      label: 'Project Start',
-      color: '#1565C0',
+      label: 'Sanctioned Commencement',
+      color: '#0284c7',
       isPast: new Date(project.startDate) <= now,
     },
     {
       date: project.expectedCompletion,
-      label: 'Expected Completion',
-      color: '#2E7D32',
+      label: 'Original Target Completion',
+      color: '#15803d',
       isPast: new Date(project.expectedCompletion) <= now,
     },
   ];
@@ -34,8 +34,8 @@ export default function ProjectTimeline({ project }: ProjectTimelineProps) {
   if (project.revisedCompletion) {
     events.push({
       date: project.revisedCompletion,
-      label: 'Revised Completion',
-      color: '#D32F2F',
+      label: 'Revised Target Milestone (Delayed)',
+      color: '#b91c1c',
       isPast: new Date(project.revisedCompletion) <= now,
     });
   }
@@ -43,25 +43,25 @@ export default function ProjectTimeline({ project }: ProjectTimelineProps) {
   events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Project Timeline
+    <Card sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+      <CardContent sx={{ p: 2.5 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.78rem', mb: 2 }}>
+          Milestone Progression Trajectory
         </Typography>
         <Stack spacing={0}>
           {events.map((event, idx) => (
             <Box key={idx} sx={{ display: 'flex', gap: 2, pb: 2 }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Circle sx={{ fontSize: 14, color: event.color, opacity: event.isPast ? 1 : 0.4 }} />
+                <Circle sx={{ fontSize: 13, color: event.color, opacity: event.isPast ? 1 : 0.45 }} />
                 {idx < events.length - 1 && (
-                  <Box sx={{ width: 2, flexGrow: 1, bgcolor: 'divider', my: 0.5 }} />
+                  <Box sx={{ width: 2, flexGrow: 1, bgcolor: '#e2e8f0', my: 0.5 }} />
                 )}
               </Box>
               <Box>
-                <Typography variant="body2" fontWeight={600}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.84rem' }}>
                   {event.label}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace', fontSize: '0.75rem' }}>
                   {formatDate(event.date)}
                 </Typography>
               </Box>

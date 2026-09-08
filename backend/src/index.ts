@@ -8,6 +8,8 @@ import predictionRoutes from './routes/predictions';
 import sectorRoutes from './routes/sectors';
 import alertRoutes from './routes/alerts';
 import uploadRoutes from './routes/upload';
+import reportRoutes from './routes/reports';
+import mlRoutes from './routes/ml';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -22,6 +24,8 @@ app.use('/api/v1/predictions', predictionRoutes);
 app.use('/api/v1/sectors', sectorRoutes);
 app.use('/api/v1/alerts', alertRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/ml', mlRoutes);
 
 // Static frontend serving in production
 if (process.env.NODE_ENV === 'production') {

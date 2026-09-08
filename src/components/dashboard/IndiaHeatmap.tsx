@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, CardContent, Typography, Tooltip as MuiTooltip, Box } from '@mui/material';
+import { Card, CardContent, Typography, Tooltip as MuiTooltip, Box, Stack, Chip } from '@mui/material';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 const INDIA_TOPO_URL = 'https://cdn.jsdelivr.net/npm/india-topojson@1.0.0/india.json';
 
@@ -36,56 +36,76 @@ export default function IndiaHeatmap({ data }: IndiaHeatmapProps) {
   const colorScale = useMemo(
     () => (value: number): string => {
       const t = Math.max(0, Math.min(1, value / maxDelay));
-      if (t < 0.5) return interpolateColor('#C8E6C9', '#FFE082', t * 2);
-      return interpolateColor('#FFE082', '#EF5350', (t - 0.5) * 2);
+      if (t < 0.5) return interpolateColor('#93c5fd', '#f59e0b', t * 2); // Soft Blue to Amber
+      return interpolateColor('#f59e0b', '#dc2626', (t - 0.5) * 2); // Amber to Crimson
     },
     [maxDelay],
   );
 
   const dataMap = useMemo(() => {
     const m = new Map<string, StateData>();
-    data.forEach((d) => m.set(d.state.toLowerCase(), d));
+    const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    data.forEach((d) => {
+      m.set(d.state.toLowerCase(), d);
+      m.set(clean(d.state), d);
+    });
     return m;
   }, [data]);
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          State-wise Delay Heatmap
-        </Typography>
+    <Card sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+      <CardContent sx={{ p: 2.5 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.78rem' }}>
+            State-wise Infrastructure Delay Dispersion
+          </Typography>
+          <Chip label="State Project Telemetry" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: '#f1f5f9', color: '#0b2545', border: '1px solid #cbd5e1' }} />
+        </Stack>
+
         <MuiTooltip title={tooltipContent} followCursor>
-          <Box>
+          <Box sx={{ bgcolor: '#f8fafc', borderRadius: 1, p: 1, border: '1px solid #e2e8f0' }}>
             <ComposableMap
               projection="geoMercator"
-              projectionConfig={{ scale: 1000, center: [82, 22] }}
+              projectionConfig={{ scale: 950, center: [82, 22] }}
               width={500}
-              height={500}
+              height={460}
               style={{ width: '100%', height: 'auto' }}
             >
               <Geographies geography={INDIA_TOPO_URL}>
                 {({ geographies }) =>
                   geographies.map((geo) => {
-                    const stateName = (geo.properties.ST_NM || '').toLowerCase();
-                    const stateData = dataMap.get(stateName);
+                    const rawName = (geo.properties.ST_NM || '').toLowerCase();
+                    const cleanName = rawName.replace(/[^a-z0-9]/g, '');
+                    const stateData =
+                      dataMap.get(rawName) ||
+                      dataMap.get(cleanName) ||
+                      (rawName.includes('andaman') ? dataMap.get('andaman & nicobar') : undefined) ||
+                      (rawName.includes('daman') || rawName.includes('dadra')
+                        ? dataMap.get('dadra & nagar haveli and daman & diu')
+                        : undefined) ||
+                      (rawName.includes('delhi') ? dataMap.get('delhi') : undefined) ||
+                      (rawName.includes('odisha') || rawName.includes('orissa') ? dataMap.get('odisha') : undefined) ||
+                      (rawName.includes('uttarakhand') || rawName.includes('uttaranchal')
+                        ? dataMap.get('uttarakhand')
+                        : undefined);
                     return (
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}
-                        fill={stateData ? colorScale(stateData.avgDelay) : '#ECEFF1'}
-                        stroke="#fff"
-                        strokeWidth={0.5}
+                        fill={stateData ? colorScale(stateData.avgDelay) : '#e2e8f0'}
+                        stroke="#cbd5e1"
+                        strokeWidth={0.7}
                         onMouseEnter={() => {
                           setTooltipContent(
                             stateData
-                              ? `${geo.properties.ST_NM}: ${stateData.count} projects, ${stateData.avgDelay}d avg delay`
+                              ? `${geo.properties.ST_NM}: ${stateData.count} Projects • Avg Delay: ${stateData.avgDelay} Days`
                               : geo.properties.ST_NM || '',
                           );
                         }}
                         onMouseLeave={() => setTooltipContent('')}
                         style={{
                           default: { outline: 'none' },
-                          hover: { outline: 'none', opacity: 0.8 },
+                          hover: { outline: 'none', fill: stateData ? '#c2410c' : '#94a3b8', cursor: 'pointer' },
                           pressed: { outline: 'none' },
                         }}
                       />

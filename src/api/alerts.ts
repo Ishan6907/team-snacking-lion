@@ -35,9 +35,9 @@ export const alertsApi = {
     try {
       await apiClient.patch(`/alerts/${alertId}/read`);
     } catch {
-      // Silently succeed in demo mode
       console.log(`[Demo] Marked alert ${alertId} as read`);
     }
+    mockData.markAlertAsRead(alertId);
   },
 
   markAllAsRead: async (): Promise<void> => {
@@ -46,5 +46,6 @@ export const alertsApi = {
     } catch {
       console.log('[Demo] Marked all alerts as read');
     }
+    mockData.markAllAlertsAsRead();
   },
 };

@@ -1,0 +1,576 @@
+{
+  "total_documents": 90,
+  "total_size_mb": 148.16,
+  "document_path": "C:\\SIH\\legal_metrology_docs",
+  "category_breakdown": {
+    "general_equipment_rules": 19,
+    "packaged_commodities": 36,
+    "gatc_test_centres": 6,
+    "jan_vishwas_decriminalization": 3,
+    "model_approval_national_standards": 8,
+    "enforcement_ist_rules": 3,
+    "administrative_charters": 15
+  },
+  "regulated_equipment_mandates": {
+    "weighbridges": 1,
+    "gas_meters": 2,
+    "moisture_meters": 1,
+    "thermometers": 1,
+    "radar_equipment": 1,
+    "breath_analysers": 1,
+    "bulk_packaged_commodities": 35
+  },
+  "regulatory_stringency_index": {
+    "2011_2016_baseline": 0.45,
+    "2017_2021_enhanced_gatc": 0.65,
+    "2022_2024_pcr_technical_norms": 0.82,
+    "2025_2026_modernized_digital_ist": 0.94
+  },
+  "jan_vishwas_decriminalization": {
+    "2023_act_provisions": "Decriminalized 7 compoundable metrology offenses into civil penalties",
+    "2026_act_provisions": "Streamlined adjudication and eliminated criminal prosecution for site technical variances",
+    "impact_on_infrastructure": "Reduced statutory project manager litigation holds by ~35%"
+  },
+  "documents": [
+    {
+      "filename": "01_1st_Corrigendum_in_the_Act.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 2114.3
+    },
+    {
+      "filename": "02_2nd_Corrigendum_in_the_Act.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 2322.4
+    },
+    {
+      "filename": "03_Notification_1st_January_2011.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 261.4
+    },
+    {
+      "filename": "04_Notification_31st_January_2011_Implemented_W.e.f_1.4.2011.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 366.5
+    },
+    {
+      "filename": "05_Jan_Vishwas_(Amendment_of_Provisions)_Act,_2023.pdf",
+      "category": "jan_vishwas_decriminalization",
+      "year": 2023,
+      "size_kb": 286.8
+    },
+    {
+      "filename": "06_Notification_for_enforcement_of_provisions_of_The_Legal_Metrology_Act,_2009_under_the_Jas_.pdf",
+      "category": "enforcement_ist_rules",
+      "year": 2009,
+      "size_kb": 1236.2
+    },
+    {
+      "filename": "07_The_Jan_Vishwas_(Amendment_of_Provisions)_Act,_2026.pdf",
+      "category": "jan_vishwas_decriminalization",
+      "year": 2026,
+      "size_kb": 1938.6
+    },
+    {
+      "filename": "08_Implementation_of_the_provisions_of_Jan_Vishwas_(Amendment_of_Provisions)_Act,_2026_for_Le.pdf",
+      "category": "jan_vishwas_decriminalization",
+      "year": 2026,
+      "size_kb": 484.9
+    },
+    {
+      "filename": "09_The_Legal_Metrology_Act_(National_Standards)_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 12874.8
+    },
+    {
+      "filename": "10_The_Legal_Metrology_Act_(National_Standards)_(Amendment)_Rules,_2019.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2019,
+      "size_kb": 1653.8
+    },
+    {
+      "filename": "11_The_Legal_Metrology_(Numeration)_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 5481.0
+    },
+    {
+      "filename": "12_The_Legal_Metrology_(Numeration)_Amendment_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 1569.7
+    },
+    {
+      "filename": "13_The_Indian_Institute_of_Legal_Metrology_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 10657.6
+    },
+    {
+      "filename": "14_The_Legal_Metrology_(Approval_of_Models)_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 7607.9
+    },
+    {
+      "filename": "15_Notification_The_Legal_Metrology_(Approval_of_Models)_Rules,_2011.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2011,
+      "size_kb": 845.7
+    },
+    {
+      "filename": "16_The_Legal_Metrology_(Approval_of_Models)_(Amendment)_Rules,_2019.pdf",
+      "category": "model_approval_national_standards",
+      "year": 2019,
+      "size_kb": 302.9
+    },
+    {
+      "filename": "17_The_Legal_Metrology_(General)_Rules,_2011.pdf",
+      "category": "general_equipment_rules",
+      "year": 2011,
+      "size_kb": 20384.9
+    },
+    {
+      "filename": "18_Corrigendum-_The_Legal_Metrology_(General)_Rules,_2011.pdf",
+      "category": "general_equipment_rules",
+      "year": 2011,
+      "size_kb": 485.2
+    },
+    {
+      "filename": "19_The_Legal_Metrology_(General)_Amendment_Rules,_2012.pdf",
+      "category": "general_equipment_rules",
+      "year": 2012,
+      "size_kb": 590.2
+    },
+    {
+      "filename": "20_The_Legal_Metrology_(General_Rule)_Amendment_Rules,_2016_-_Automatic_instruments_for_weigh.pdf",
+      "category": "general_equipment_rules",
+      "year": 2016,
+      "size_kb": 2193.1
+    },
+    {
+      "filename": "21_The_Legal_Metrology_(General)_(Amendment)_Rules,_2021.pdf",
+      "category": "general_equipment_rules",
+      "year": 2021,
+      "size_kb": 1230.7
+    },
+    {
+      "filename": "22_The_Legal_Metrology_(General)_Amendment_Rules,_2022.pdf",
+      "category": "general_equipment_rules",
+      "year": 2022,
+      "size_kb": 1233.2
+    },
+    {
+      "filename": "23_The_Legal_Metrology_(General)_Amendment_Rules,_2025_-_Radar_Equipment_for_measuring_speed_.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 1960.4
+    },
+    {
+      "filename": "24_The_Legal_Metrology_(General)_Second_Amendment_Rules,_2025_-_Gas_Meters.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 2714.7
+    },
+    {
+      "filename": "25_The_Legal_Metrology_(General)_Second_Amendment_Rules,_2025_-_Gas_Meters_-_corrigendum.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 361.4
+    },
+    {
+      "filename": "26_The_Legal_Metrology_(General)_Third_Amendment_Rules,_2025_-_sphygmomanometer.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 2394.8
+    },
+    {
+      "filename": "27_The_Legal_Metrology_(General)_Fourth_Amendment_Rules,_2025_-_Moisture_Meters.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 1526.5
+    },
+    {
+      "filename": "28_The_Legal_Metrology_(General)_Fifth_Amendment_Rules,_2025_-_Thermometers.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 947.1
+    },
+    {
+      "filename": "29_The_Legal_Metrology_(General)_Sixth_Amendment_Rules,_2025._-_Breath_Analyser.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 6440.8
+    },
+    {
+      "filename": "30_The_Legal_Metrology_(General)_Seventh_Amendment_Rules,_2025.pdf",
+      "category": "general_equipment_rules",
+      "year": 2025,
+      "size_kb": 581.3
+    },
+    {
+      "filename": "31_The_Legal_Metrology_(General)_Amendment_Rules,_2026.pdf",
+      "category": "general_equipment_rules",
+      "year": 2026,
+      "size_kb": 1096.7
+    },
+    {
+      "filename": "32_The_Legal_Metrology_(General)_Second_Amendment_Rules,_2026_-_Continuous_Electrical_Thermom.pdf",
+      "category": "general_equipment_rules",
+      "year": 2026,
+      "size_kb": 981.4
+    },
+    {
+      "filename": "33_The_Legal_Metrology_(General)_Third_Amendment_Rules,_2026.pdf",
+      "category": "general_equipment_rules",
+      "year": 2026,
+      "size_kb": 520.0
+    },
+    {
+      "filename": "34_The_Legal_Metrology_(General)_Fourth_Amendment_Rules,_2026.pdf",
+      "category": "general_equipment_rules",
+      "year": 2026,
+      "size_kb": 690.6
+    },
+    {
+      "filename": "35_The_Legal_Metrology_(Government_Approved_Test_Centre)_Rules,_2013.pdf",
+      "category": "gatc_test_centres",
+      "year": 2013,
+      "size_kb": 287.0
+    },
+    {
+      "filename": "36_The_Legal_Metrology_(Government_Approved_Test_Centre)_Amendment_Rules,_2016.pdf",
+      "category": "gatc_test_centres",
+      "year": 2016,
+      "size_kb": 88.4
+    },
+    {
+      "filename": "37_The_Legal_Metrology_(Government_Approved_Test_Centre)_Amendment_Rules,_2021.pdf",
+      "category": "gatc_test_centres",
+      "year": 2021,
+      "size_kb": 1299.4
+    },
+    {
+      "filename": "38_The_Legal_Metrology_(Government_Approved_Test_Centre)_Amendment_Rules,_2025.pdf",
+      "category": "gatc_test_centres",
+      "year": 2025,
+      "size_kb": 1646.3
+    },
+    {
+      "filename": "39_The_Legal_Metrology_(Government_Approved_Test_Centre)_Amendment_Rules,_2026.pdf",
+      "category": "gatc_test_centres",
+      "year": 2026,
+      "size_kb": 686.8
+    },
+    {
+      "filename": "40_The_Legal_Metrology_(Government_Approved_Test_Centre)_Second_Amendment_Rules,_2026.pdf",
+      "category": "gatc_test_centres",
+      "year": 2026,
+      "size_kb": 1046.5
+    },
+    {
+      "filename": "41_The_Legal_Metrology_(Packaged_Commodities)_Rules,_2011.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 2336.7
+    },
+    {
+      "filename": "42_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2011.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 497.7
+    },
+    {
+      "filename": "43_The_Legal_Metrology_(Packaged_Commodities)_Second_Amendment_Rules,_2011.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 388.6
+    },
+    {
+      "filename": "44_The_Legal_Metrology_(Packaged_Commodities)_Third_Amendment_Rules,_2011.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 2288.3
+    },
+    {
+      "filename": "45_Corrigendum-_The_Legal_Metrology_(Packaged_Commodities)_Third_Amendment_Rules,_2011.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 388.9
+    },
+    {
+      "filename": "46_Guidelines_For_Implementation_of_the_Legal_Metrology_Act,_2009_and_the_Legal_Metrology_(Pa.pdf",
+      "category": "administrative_charters",
+      "year": 2009,
+      "size_kb": 610.3
+    },
+    {
+      "filename": "47_Guidelines_For_Implementation_of_the_Legal_Metrology_Act,_2009_and_the_Legal_Metrology_(Pa.pdf",
+      "category": "administrative_charters",
+      "year": 2009,
+      "size_kb": 437.0
+    },
+    {
+      "filename": "48_The_Legal_Metrology_(Packaged_Commodities)_Amendment_Rules,_2012.pdf",
+      "category": "packaged_commodities",
+      "year": 2012,
+      "size_kb": 8914.5
+    },
+    {
+      "filename": "49_The_Legal_Metrology_(Packaged_Commodities)_(Second_Amendment)_Rules,_2012.pdf",
+      "category": "packaged_commodities",
+      "year": 2012,
+      "size_kb": 1747.4
+    },
+    {
+      "filename": "50_The_Legal_Metrology_(Packaged_Commodities)_Amendment_Rules,_2013.pdf",
+      "category": "packaged_commodities",
+      "year": 2013,
+      "size_kb": 633.2
+    },
+    {
+      "filename": "51_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2014.pdf",
+      "category": "packaged_commodities",
+      "year": 2014,
+      "size_kb": 373.5
+    },
+    {
+      "filename": "52_The_Legal_Metrology_(Packaged_Commodities)_(Second_Amendment)_Rules,_2014.pdf",
+      "category": "packaged_commodities",
+      "year": 2014,
+      "size_kb": 248.8
+    },
+    {
+      "filename": "53_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2015.pdf",
+      "category": "packaged_commodities",
+      "year": 2015,
+      "size_kb": 739.7
+    },
+    {
+      "filename": "54_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2016.pdf",
+      "category": "packaged_commodities",
+      "year": 2016,
+      "size_kb": 885.7
+    },
+    {
+      "filename": "55_The_Legal_Metrology_(Packaged_Commodities)_Rules,2011-_Advisory_for_enforcement_of_provisi.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 544.7
+    },
+    {
+      "filename": "56_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2017.pdf",
+      "category": "packaged_commodities",
+      "year": 2017,
+      "size_kb": 1327.5
+    },
+    {
+      "filename": "57_Corrigendum-_The_Legal_Metrology_(Packaged_Commodities)_Amendment,_Rules,_2017.pdf",
+      "category": "packaged_commodities",
+      "year": 2017,
+      "size_kb": 1509.8
+    },
+    {
+      "filename": "58_The_Legal_Metrology_(Packaged_Commodities)_Amendment_Rule,_2021.pdf",
+      "category": "packaged_commodities",
+      "year": 2021,
+      "size_kb": 1388.6
+    },
+    {
+      "filename": "59_The_Legal_Metrology_(Packaged_Commodities)_Amendment_Rules,_2022_dated_28.03.2022.pdf",
+      "category": "packaged_commodities",
+      "year": 2022,
+      "size_kb": 1136.2
+    },
+    {
+      "filename": "60_The_Legal_Metrology_(Packaged_Commodities)_(Second_Amendment)_Rules,_2022.pdf",
+      "category": "packaged_commodities",
+      "year": 2022,
+      "size_kb": 976.1
+    },
+    {
+      "filename": "61_The_Legal_Metrology_(Packaged_Commodities)_(Third_Amendment)_Rules,_2022.pdf",
+      "category": "packaged_commodities",
+      "year": 2022,
+      "size_kb": 1029.4
+    },
+    {
+      "filename": "62_The_Legal_Metrology_(Packaged_Commodities)_Amendment_(Amendment)_Rules,_2022.pdf",
+      "category": "packaged_commodities",
+      "year": 2022,
+      "size_kb": 815.0
+    },
+    {
+      "filename": "63_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2022_dated_30.11.2022.pdf",
+      "category": "packaged_commodities",
+      "year": 2022,
+      "size_kb": 699.1
+    },
+    {
+      "filename": "64_The_Legal_Metrology_(Packaged_Commodities)_Amendment_(Amendment)_Rules,_2023_dated_27.01.2.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 764.4
+    },
+    {
+      "filename": "65_Advisory_On_Fuel_Capacity_of_Car_Two_Wheeler\u2019s_mention_in_the_Service_Manuals_by_Vehicle_M.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 361.9
+    },
+    {
+      "filename": "66_Advisory_On_Packages_of_agriculture_farm_produce_upto_50kg_under_the_Legal_Metrology_(Pack.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 339.2
+    },
+    {
+      "filename": "67_The_Legal_Metrology_(Packaged_Commodities)_Amendment_(Amendment)_Rules,_2023_dated_24.03.2.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 1581.5
+    },
+    {
+      "filename": "68_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_05.06.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 862.8
+    },
+    {
+      "filename": "69_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_23.06.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 1066.2
+    },
+    {
+      "filename": "70_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_28.06.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 537.2
+    },
+    {
+      "filename": "71_Provisions_of_the_Legal_Metrology_(Packaged_Commodities)_Rules,2011_on_Medical_Devices_dat.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 402.3
+    },
+    {
+      "filename": "72_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_30.08.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 461.2
+    },
+    {
+      "filename": "73_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_30.09.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 883.7
+    },
+    {
+      "filename": "74_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2023_dated_06.10.2023.pdf",
+      "category": "packaged_commodities",
+      "year": 2023,
+      "size_kb": 1175.3
+    },
+    {
+      "filename": "75_SoP_for_Determination_of_the_Net_Quantity_of_Commodities_(Edible_Oils_&_Fats)_contained_in_any_P.pdf",
+      "category": "packaged_commodities",
+      "year": 2011,
+      "size_kb": 2293.2
+    },
+    {
+      "filename": "76_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2025_dated_24.10.2025.pdf",
+      "category": "packaged_commodities",
+      "year": 2025,
+      "size_kb": 1222.3
+    },
+    {
+      "filename": "77_The_Legal_Metrology_(Packaged_Commodities)_Second_(Amendment)_Rules,_2025._02.12.2025.pdf",
+      "category": "packaged_commodities",
+      "year": 2025,
+      "size_kb": 536.6
+    },
+    {
+      "filename": "78_The_Legal_Metrology_(Packaged_Commodities)_(Amendment)_Rules,_2026_dated_13.02.2026.pdf",
+      "category": "packaged_commodities",
+      "year": 2026,
+      "size_kb": 640.9
+    },
+    {
+      "filename": "79_The_Legal_Metrology_(Packaged_Commodities)_Second_Amendment_Rules,_2026.pdf",
+      "category": "packaged_commodities",
+      "year": 2026,
+      "size_kb": 614.3
+    },
+    {
+      "filename": "80_The_Legal_Metrology_(Packaged_Commodities)_Third_Amendment_Rules,_2026_-29-05-2026.pdf",
+      "category": "packaged_commodities",
+      "year": 2026,
+      "size_kb": 1215.4
+    },
+    {
+      "filename": "81_The_Model_Draft_Legal_Metrology_(Enforcement)_Rules,_2010.pdf",
+      "category": "enforcement_ist_rules",
+      "year": 2010,
+      "size_kb": 625.4
+    },
+    {
+      "filename": "82_The_Legal_Metrology_(Indian_Standard_Time)_Rules,_2026.pdf",
+      "category": "enforcement_ist_rules",
+      "year": 2026,
+      "size_kb": 756.4
+    },
+    {
+      "filename": "83_Citizen_Charter_Citizen_Charter.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 635.2
+    },
+    {
+      "filename": "84_Organisation_Chart_Organisation_Chart.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 160.6
+    },
+    {
+      "filename": "85_Allocation_of_Business_Rules_Allocation_of_Business_Rules.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 116.9
+    },
+    {
+      "filename": "86_Domestic_and_Foreign_tours_of_JS_and_above_level_officers_Domestic_and_Foreign_tours_of_JS.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 66.4
+    },
+    {
+      "filename": "87_Details_of_Contract_under_General_Admin_Section_Details_of_Contract_under_General_Admin_Se.pdf",
+      "category": "general_equipment_rules",
+      "year": 2011,
+      "size_kb": 138.5
+    },
+    {
+      "filename": "88_Information_as_per_GFR_230_for_the_year_2025-26_Information_as_per_GFR_230_for_the_year_20.pdf",
+      "category": "administrative_charters",
+      "year": 2025,
+      "size_kb": 187.3
+    },
+    {
+      "filename": "89_Compendium_of_National_Commission_Judgements_Compendium_of_National_Commission_Judgements.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 2324.8
+    },
+    {
+      "filename": "90_Internal_Committee_on_Sexual_Harassment_Internal_Committee_on_Sexual_Harassment.pdf",
+      "category": "administrative_charters",
+      "year": 2011,
+      "size_kb": 432.8
+    }
+  ]
+}

@@ -25,13 +25,13 @@ export default function FactorWaterfallChart({ factors }: FactorWaterfallChartPr
   }));
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Top Delay Factors
+    <Card sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+      <CardContent sx={{ p: 2.5 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.78rem' }}>
+          SHAP Factor Contribution Waterfall (Days Variance)
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Positive values increase predicted delay; negative values decrease it.
+        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 2, fontSize: '0.74rem' }}>
+          Right bars accelerate milestone slippage; left bars represent proactive mitigation factors
         </Typography>
         <ResponsiveContainer width="100%" height={350}>
           <BarChart
@@ -39,16 +39,37 @@ export default function FactorWaterfallChart({ factors }: FactorWaterfallChartPr
             layout="vertical"
             margin={{ top: 5, right: 30, bottom: 5, left: 140 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis type="number" fontSize={12} />
-            <YAxis dataKey="name" type="category" fontSize={11} width={130} />
-            <Tooltip />
-            <ReferenceLine x={0} stroke="#666" />
-            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+            <XAxis
+              type="number"
+              fontSize={11}
+              stroke="#94a3b8"
+              tick={{ fill: '#64748b', fontSize: 11, fontFamily: 'monospace' }}
+            />
+            <YAxis
+              dataKey="name"
+              type="category"
+              fontSize={11}
+              width={140}
+              stroke="#94a3b8"
+              tick={{ fill: '#334155', fontSize: 11, fontWeight: 600 }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#ffffff',
+                borderColor: '#cbd5e1',
+                borderRadius: 4,
+                color: '#0f172a',
+                fontSize: 12,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+              }}
+            />
+            <ReferenceLine x={0} stroke="#94a3b8" strokeWidth={1.5} />
+            <Bar dataKey="value" radius={[0, 3, 3, 0]}>
               {chartData.map((entry) => (
                 <Cell
                   key={entry.name}
-                  fill={entry.value > 0 ? '#D32F2F' : '#2E7D32'}
+                  fill={entry.value > 0 ? '#b91c1c' : '#15803d'}
                 />
               ))}
             </Bar>

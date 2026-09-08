@@ -386,5 +386,5 @@ def create_paimana_summary_pdf(filename):
     print(f"Successfully generated {filename} ({len(full_pdf_bytes)} bytes)")
 
 if __name__ == "__main__":
-    target = "/Users/krishnapriyashivkumarbarhalikar/.gemini/antigravity/scratch/paimana-frontend/paimana_codebase_summary.pdf"
+    target = sys.argv[1] if len(sys.argv) > 1 else "paimana_summary.pdf"
     create_paimana_summary_pdf(target)

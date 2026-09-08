@@ -1,3 +1,12 @@
+export interface ProjectCriticalIssue {
+  code: string;
+  title: string;
+  authority: string;
+  severity: 'critical' | 'high' | 'medium';
+  status: 'pending_cabinet' | 'under_litigation' | 'inter_ministerial' | 'resolved';
+  escalationDate: string;
+}
+
 export interface ProjectListItem {
   id: string;
   name: string;
@@ -8,6 +17,15 @@ export interface ProjectListItem {
   physicalProgress: number;
   delayDays: number;
   predictedDelay: number;
+  mospiCode?: string;
+  originalCostCr?: number;
+  revisedCostCr?: number;
+  costOverrunCr?: number;
+  primaryBottleneck?: string;
+  contractor?: string;
+  implementingAgency?: string;
+  clearanceMilestone?: string;
+  cabinetNoteRef?: string;
 }
 
 export interface Project extends ProjectListItem {
@@ -20,6 +38,7 @@ export interface Project extends ProjectListItem {
   revisedCompletion?: string;
   contractor?: string;
   implementingAgency: string;
+  criticalIssues?: ProjectCriticalIssue[];
 }
 
 export interface DelayFactor {
@@ -80,8 +99,8 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ProjectFilters {
-  page?: number;
-  pageSize?: number;
+  page?: number | string;
+  pageSize?: number | string;
   sector?: string;
   state?: string;
   status?: string;
@@ -89,100 +108,1073 @@ export interface ProjectFilters {
   search?: string;
 }
 
-const SECTORS = ['Roads & Highways', 'Railways', 'Power & Energy', 'Water Resources', 'Urban Development', 'Telecommunications'];
-const STATES = ['Maharashtra', 'Uttar Pradesh', 'Karnataka', 'Tamil Nadu', 'Gujarat', 'Rajasthan', 'West Bengal', 'Madhya Pradesh', 'Kerala', 'Delhi'];
-const STATUSES: Array<'on_track' | 'at_risk' | 'delayed' | 'completed' | 'not_started'> = ['on_track', 'at_risk', 'delayed', 'completed', 'not_started'];
-const RISK_LEVELS: Array<'low' | 'medium' | 'high' | 'critical'> = ['low', 'medium', 'high', 'critical'];
-
-function randomInt(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function randomFloat(min: number, max: number, dec = 2) { return +(Math.random() * (max - min) + min).toFixed(dec); }
-function randomItem<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
-
-const PROJECT_NAMES = [
-  'NH-48 Six-Lane Expansion', 'Mumbai Metro Line 4', 'Jaipur Ring Road Phase II',
-  'Bangalore Suburban Rail', 'Chennai Desalination Plant', 'Ganga Expressway',
-  'Delhi-Meerut RRTS', 'Polavaram Dam', 'Navi Mumbai Airport', 'Udhampur-Srinagar Rail',
-  'Eastern Dedicated Freight Corridor', 'Pune Metro Phase I', 'AIIMS Madurai',
-  'Amaravati Capital City', 'Zojila Tunnel', 'Char Dham Highway',
-  'Ahmedabad Metro Phase II', 'Paradip Refinery Expansion', 'Kochi Water Metro',
-  'Hyderabad Pharma City', 'Dwarka Expressway', 'Jewar Airport Phase I',
-  'Western Dedicated Freight Corridor', 'Smart City Varanasi', 'Lucknow Metro Extension',
-  'MTHL Sea Bridge', 'Sagarmala Port Modernization', 'Solar Park Rajasthan Phase III',
-  'Brahmaputra Cracker Project', 'Vizag-Chennai Industrial Corridor',
-];
-
-const AGENCIES = ['NHAI', 'NHPC', 'IRCON', 'RITES', 'NTPC', 'PGCIL', 'DMRC', 'MMRDA', 'BMRCL', 'AAI'];
-
-function makeFactor(name: string, display: string): DelayFactor {
-  const dir = Math.random() > 0.4 ? 'increases_delay' : 'decreases_delay';
-  return { name, displayName: display, importance: randomFloat(0.02, 0.25, 3), value: randomInt(10, 95), direction: dir as 'increases_delay' | 'decreases_delay' };
+export interface MarqueeProjectDef {
+  id: string;
+  mospiCode: string;
+  name: string;
+  sector: string;
+  state: string;
+  district: string;
+  sanctionedCost: number;
+  expenditure: number;
+  originalCostCr: number;
+  revisedCostCr: number;
+  costOverrunCr: number;
+  physicalProgress: number;
+  financialProgress: number;
+  startDate: string;
+  expectedCompletion: string;
+  revisedCompletion?: string;
+  status: 'on_track' | 'at_risk' | 'delayed' | 'completed';
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  delayDays: number;
+  predictedDelay: number;
+  contractor: string;
+  implementingAgency: string;
+  primaryBottleneck: string;
+  clearanceMilestone: string;
+  cabinetNoteRef: string;
+  criticalIssues: ProjectCriticalIssue[];
 }
 
-const FACTOR_POOL: [string, string][] = [
-  ['land_acquisition', 'Land Acquisition Delay'], ['env_clearance', 'Environmental Clearance'],
-  ['funding_gap', 'Funding Gap %'], ['contractor_capacity', 'Contractor Capacity Score'],
-  ['monsoon_impact', 'Monsoon Impact'], ['labour_shortage', 'Labour Shortage Index'],
-  ['material_inflation', 'Material Cost Inflation'], ['design_change', 'Design Change Count'],
-  ['litigation', 'Active Litigations'], ['utility_shifting', 'Utility Shifting Progress'],
-  ['govt_approval', 'Pending Govt Approvals'], ['terrain_difficulty', 'Terrain Difficulty'],
+export const MARQUEE_PROJECTS: MarqueeProjectDef[] = [
+  {
+    id: 'proj-001',
+    mospiCode: 'MoSPI/OCMS/RAIL-2002-0418',
+    name: 'Udhampur-Srinagar-Baramulla Rail Link (USBRL)',
+    sector: 'Railways',
+    state: 'Jammu & Kashmir',
+    district: 'Reasi & Ramban',
+    sanctionedCost: 25000000000,
+    expenditure: 370120000000,
+    originalCostCr: 2500,
+    revisedCostCr: 37012,
+    costOverrunCr: 34512,
+    physicalProgress: 96,
+    financialProgress: 98,
+    startDate: '2002-03-15',
+    expectedCompletion: '2007-08-15',
+    revisedCompletion: '2026-06-30',
+    status: 'delayed',
+    riskLevel: 'high',
+    delayDays: 1825,
+    predictedDelay: 120,
+    contractor: 'Afcons Infrastructure & Konkan Railway Corp',
+    implementingAgency: 'Northern Railway / KRCL',
+    primaryBottleneck: 'Himalayan thrust fault geology & T-49 tunnel water ingress',
+    clearanceMilestone: 'Commissioner of Railway Safety (CRS) Katra-Reasi statutory speed trials',
+    cabinetNoteRef: 'CCEA/2024/RAIL/J&K-092',
+    criticalIssues: [
+      {
+        code: 'ISS-USBRL-01',
+        title: 'Tunnel T-49 high seepage rate in Murree formation',
+        authority: 'Geological Survey of India / Northern Railway',
+        severity: 'high',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-14',
+      },
+      {
+        code: 'ISS-USBRL-02',
+        title: 'Anji Khad cable-stayed bridge wind sensor telemetric recalibration',
+        authority: 'Konkan Railway Corporation Limited',
+        severity: 'medium',
+        status: 'resolved',
+        escalationDate: '2024-11-20',
+      },
+    ],
+  },
+  {
+    id: 'proj-002',
+    mospiCode: 'MoSPI/OCMS/HSR-2015-0812',
+    name: 'Mumbai-Ahmedabad High Speed Rail (MAHSR Bullet Train)',
+    sector: 'Railways',
+    state: 'Gujarat',
+    district: 'Surat & Ahmedabad',
+    sanctionedCost: 1080000000000,
+    expenditure: 684000000000,
+    originalCostCr: 108000,
+    revisedCostCr: 165000,
+    costOverrunCr: 57000,
+    physicalProgress: 52,
+    financialProgress: 56,
+    startDate: '2017-09-14',
+    expectedCompletion: '2023-12-31',
+    revisedCompletion: '2028-03-31',
+    status: 'at_risk',
+    riskLevel: 'critical',
+    delayDays: 730,
+    predictedDelay: 390,
+    contractor: 'Larsen & Toubro Ltd & Afcons (Thane Tunnel)',
+    implementingAgency: 'NHSRCL (JICA ODA Co-Financed)',
+    primaryBottleneck: 'BKC underground terminal & undersea Thane Creek tunnel utility relocation',
+    clearanceMilestone: 'TBM-3 launch shaft environmental safety signoff at Vikhroli',
+    cabinetNoteRef: 'PMO/PRAGATI/2025/HSR-014',
+    criticalIssues: [
+      {
+        code: 'ISS-HSR-01',
+        title: 'Thane Creek 21km undersea tunnel TBM retrieval pit land encumbrance',
+        authority: 'MMRDA & Forest Department Maharashtra',
+        severity: 'critical',
+        status: 'pending_cabinet',
+        escalationDate: '2025-02-04',
+      },
+      {
+        code: 'ISS-HSR-02',
+        title: 'Shinkansen E5 electrical signaling integration interface protocol with JICA',
+        authority: 'Railway Board & JICA Technical Mission',
+        severity: 'high',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-28',
+      },
+    ],
+  },
+  {
+    id: 'proj-003',
+    mospiCode: 'MoSPI/OCMS/DFC-2006-0199',
+    name: 'Western Dedicated Freight Corridor (WDFC - Dadri to JNPT)',
+    sector: 'Railways',
+    state: 'Maharashtra',
+    district: 'Raigad & Palghar',
+    sanctionedCost: 511010000000,
+    expenditure: 749000000000,
+    originalCostCr: 51101,
+    revisedCostCr: 81459,
+    costOverrunCr: 30358,
+    physicalProgress: 92,
+    financialProgress: 90,
+    startDate: '2007-02-01',
+    expectedCompletion: '2018-03-31',
+    revisedCompletion: '2026-09-30',
+    status: 'delayed',
+    riskLevel: 'medium',
+    delayDays: 1095,
+    predictedDelay: 110,
+    contractor: 'L&T - Sojitz Consortium & Tata Projects',
+    implementingAgency: 'DFCCIL',
+    primaryBottleneck: 'Vaitarna River bridge girder erection & JNPT container terminal track link',
+    clearanceMilestone: 'Coastal Regulation Zone (CRZ-I) final clearance at JNPT approach',
+    cabinetNoteRef: 'CCEA/2023/DFCCIL/W-31',
+    criticalIssues: [
+      {
+        code: 'ISS-WDFC-01',
+        title: 'Vaitarna rail bridge heavy girder launching during neap tide window',
+        authority: 'Maharashtra Maritime Board / DFCCIL',
+        severity: 'medium',
+        status: 'inter_ministerial',
+        escalationDate: '2024-12-15',
+      },
+    ],
+  },
+  {
+    id: 'proj-004',
+    mospiCode: 'MoSPI/OCMS/DFC-2006-0200',
+    name: 'Eastern Dedicated Freight Corridor (EDFC - Sahnewal to Sonnagar)',
+    sector: 'Railways',
+    state: 'Uttar Pradesh',
+    district: 'Prayagraj & Chandauli',
+    sanctionedCost: 303580000000,
+    expenditure: 418000000000,
+    originalCostCr: 30358,
+    revisedCostCr: 42700,
+    costOverrunCr: 12342,
+    physicalProgress: 100,
+    financialProgress: 97,
+    startDate: '2007-02-01',
+    expectedCompletion: '2019-12-31',
+    revisedCompletion: '2024-03-31',
+    status: 'completed',
+    riskLevel: 'low',
+    delayDays: 365,
+    predictedDelay: 0,
+    contractor: 'GMR Infrastructure & Tata Projects',
+    implementingAgency: 'DFCCIL',
+    primaryBottleneck: 'Sonnagar-Dankuni section PPP concession model monetization structuring',
+    clearanceMilestone: 'Commercial operational acceptance certificate issued',
+    cabinetNoteRef: 'MoR/EDFC/2024/PKG-03',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-005',
+    mospiCode: 'MoSPI/OCMS/WTR-2009-0044',
+    name: 'Polavaram National Irrigation Project',
+    sector: 'Water Resources',
+    state: 'Andhra Pradesh',
+    district: 'Eluru & Alluri Sitharama Raju',
+    sanctionedCost: 160100000000,
+    expenditure: 395000000000,
+    originalCostCr: 16010,
+    revisedCostCr: 55548,
+    costOverrunCr: 39538,
+    physicalProgress: 74,
+    financialProgress: 70,
+    startDate: '2009-04-10',
+    expectedCompletion: '2016-06-30',
+    revisedCompletion: '2027-12-31',
+    status: 'delayed',
+    riskLevel: 'critical',
+    delayDays: 1460,
+    predictedDelay: 480,
+    contractor: 'Megha Engineering & Infrastructures Ltd (MEIL)',
+    implementingAgency: 'Polavaram Project Authority (PPA) / APWRD',
+    primaryBottleneck: 'Earth-cum-Rockfill Dam diaphragm wall scouring & CWC technical concurrence',
+    clearanceMilestone: 'Central Water Commission (CWC) vibro-stone column retrofitting design clearance',
+    cabinetNoteRef: 'MoJS/PPA/2025/DAM-77',
+    criticalIssues: [
+      {
+        code: 'ISS-POL-01',
+        title: 'Diaphragm wall foundation gap scouring repair methodology concurrence',
+        authority: 'Central Water Commission / Dam Design Review Panel',
+        severity: 'critical',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-19',
+      },
+      {
+        code: 'ISS-POL-02',
+        title: 'Phase-1 R&R submergence package compensation for 20,946 displaced families',
+        authority: 'Ministry of Jal Shakti / GoAP',
+        severity: 'high',
+        status: 'pending_cabinet',
+        escalationDate: '2024-12-10',
+      },
+    ],
+  },
+  {
+    id: 'proj-006',
+    mospiCode: 'MoSPI/OCMS/ROADS-2018-0621',
+    name: 'Zojila Bi-Directional Tunnel (NH-1 Srinagar-Leh Highway)',
+    sector: 'Roads & Highways',
+    state: 'Jammu & Kashmir',
+    district: 'Ganderbal & Kargil',
+    sanctionedCost: 68080000000,
+    expenditure: 51200000000,
+    originalCostCr: 6808,
+    revisedCostCr: 8300,
+    costOverrunCr: 1492,
+    physicalProgress: 61,
+    financialProgress: 64,
+    startDate: '2018-05-19',
+    expectedCompletion: '2026-11-30',
+    revisedCompletion: '2027-10-31',
+    status: 'at_risk',
+    riskLevel: 'high',
+    delayDays: 420,
+    predictedDelay: 220,
+    contractor: 'Megha Engineering & Infrastructures Ltd (MEIL)',
+    implementingAgency: 'NHIDCL',
+    primaryBottleneck: 'Sub-zero winter concrete freezing & high avalanche danger on approach cuts',
+    clearanceMilestone: 'Ventilation shaft egress cavern excavation approval by NHIDCL technical board',
+    cabinetNoteRef: 'MoRTH/NHIDCL/2024/ZOJ-19',
+    criticalIssues: [
+      {
+        code: 'ISS-ZOJ-01',
+        title: 'Minamarg portal sub-zero batching plant insulation and aggregate heating logistics',
+        authority: 'NHIDCL Project Directorate',
+        severity: 'high',
+        status: 'inter_ministerial',
+        escalationDate: '2025-02-11',
+      },
+    ],
+  },
+  {
+    id: 'proj-007',
+    mospiCode: 'MoSPI/OCMS/EXP-2018-0332',
+    name: 'Delhi-Mumbai Expressway (NE-4 Vadodara-Virar Package)',
+    sector: 'Roads & Highways',
+    state: 'Gujarat',
+    district: 'Valsad & Navsari',
+    sanctionedCost: 870000000000,
+    expenditure: 914000000000,
+    originalCostCr: 87000,
+    revisedCostCr: 103000,
+    costOverrunCr: 16000,
+    physicalProgress: 86,
+    financialProgress: 89,
+    startDate: '2019-03-01',
+    expectedCompletion: '2023-03-31',
+    revisedCompletion: '2025-12-31',
+    status: 'at_risk',
+    riskLevel: 'medium',
+    delayDays: 320,
+    predictedDelay: 120,
+    contractor: 'Dilip Buildcon, Patel Engineering & IRB Infrastructure',
+    implementingAgency: 'National Highways Authority of India (NHAI)',
+    primaryBottleneck: 'Section 3G agrarian land dispute compensation awards in South Gujarat',
+    clearanceMilestone: 'District Collector land dispute arbitration conciliation award',
+    cabinetNoteRef: 'MoRTH/NHAI/EXP/2025-08',
+    criticalIssues: [
+      {
+        code: 'ISS-DME-01',
+        title: 'Orchard land valuation parity claims pending in Gujarat High Court writ petition',
+        authority: 'District Collector Valsad / NHAI RO Gujarat',
+        severity: 'high',
+        status: 'under_litigation',
+        escalationDate: '2024-10-18',
+      },
+    ],
+  },
+  {
+    id: 'proj-008',
+    mospiCode: 'MoSPI/OCMS/EXP-2020-0771',
+    name: 'Ganga Expressway (Meerut to Prayagraj 594 km)',
+    sector: 'Roads & Highways',
+    state: 'Uttar Pradesh',
+    district: 'Budaun & Hardoi',
+    sanctionedCost: 362300000000,
+    expenditure: 248000000000,
+    originalCostCr: 36230,
+    revisedCostCr: 37350,
+    costOverrunCr: 1120,
+    physicalProgress: 71,
+    financialProgress: 68,
+    startDate: '2021-12-18',
+    expectedCompletion: '2025-06-30',
+    revisedCompletion: '2025-12-31',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 110,
+    predictedDelay: 50,
+    contractor: 'Adani Enterprises & IRB Infrastructure JV',
+    implementingAgency: 'Uttar Pradesh Expressways Industrial Development Authority (UPEIDA)',
+    primaryBottleneck: 'Bulk pond ash procurement supply chain from NTPC Unchahar',
+    clearanceMilestone: 'Ministry of Environment fly ash corridor transit authorization',
+    cabinetNoteRef: 'UP-EXP/2024/GNG-44',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-009',
+    mospiCode: 'MoSPI/OCMS/AVIA-2017-0105',
+    name: 'Navi Mumbai International Airport (DB Patil NMIA Phase 1)',
+    sector: 'Urban Development',
+    state: 'Maharashtra',
+    district: 'Raigad',
+    sanctionedCost: 141320000000,
+    expenditure: 172000000000,
+    originalCostCr: 14132,
+    revisedCostCr: 19646,
+    costOverrunCr: 5514,
+    physicalProgress: 85,
+    financialProgress: 88,
+    startDate: '2018-02-18',
+    expectedCompletion: '2021-12-31',
+    revisedCompletion: '2025-09-30',
+    status: 'at_risk',
+    riskLevel: 'medium',
+    delayDays: 520,
+    predictedDelay: 75,
+    contractor: 'Larsen & Toubro Ltd',
+    implementingAgency: 'CIDCO / Navi Mumbai International Airport Ltd (NMIAL)',
+    primaryBottleneck: 'Ulwe river diversion canal stabilization & DGCA calibration flight trails',
+    clearanceMilestone: 'DGCA Aerodrome Operating Certificate (AOC) audit signoff',
+    cabinetNoteRef: 'MoCA/CIDCO/2025/AIR-12',
+    criticalIssues: [
+      {
+        code: 'ISS-NMIA-01',
+        title: 'Runway 26R instrument landing system localizer frequency interference with shipping lanes',
+        authority: 'Directorate General of Civil Aviation (DGCA)',
+        severity: 'medium',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-30',
+      },
+    ],
+  },
+  {
+    id: 'proj-010',
+    mospiCode: 'MoSPI/OCMS/RAIL-2020-0588',
+    name: 'Bengaluru Suburban Railway Project (BSRP Corridors 1-4)',
+    sector: 'Railways',
+    state: 'Karnataka',
+    district: 'Bengaluru Urban',
+    sanctionedCost: 157670000000,
+    expenditure: 41200000000,
+    originalCostCr: 15767,
+    revisedCostCr: 17900,
+    costOverrunCr: 2133,
+    physicalProgress: 31,
+    financialProgress: 26,
+    startDate: '2020-10-21',
+    expectedCompletion: '2026-10-31',
+    revisedCompletion: '2028-12-31',
+    status: 'delayed',
+    riskLevel: 'critical',
+    delayDays: 610,
+    predictedDelay: 450,
+    contractor: 'L&T Construction (Corridor 2 - Mallige Line)',
+    implementingAgency: 'Rail Infrastructure Development Company (Karnataka) Ltd (K-RIDE)',
+    primaryBottleneck: 'Defence land transfer at Jalahalli & SWR operational track sharing approvals',
+    clearanceMilestone: 'Ministry of Defence Section 11 parcel alienation concurrence',
+    cabinetNoteRef: 'KRIDE/BSRP/2025/CAB-02',
+    criticalIssues: [
+      {
+        code: 'ISS-BSRP-01',
+        title: 'Air Force Station Jalahalli boundary wall realignment and land lease execution',
+        authority: 'Ministry of Defence / K-RIDE',
+        severity: 'critical',
+        status: 'pending_cabinet',
+        escalationDate: '2025-02-05',
+      },
+    ],
+  },
+  {
+    id: 'proj-011',
+    mospiCode: 'MoSPI/OCMS/URBN-2016-0219',
+    name: 'Kochi Water Metro Network Phase 1 & 2',
+    sector: 'Urban Development',
+    state: 'Kerala',
+    district: 'Ernakulam',
+    sanctionedCost: 7470000000,
+    expenditure: 9850000000,
+    originalCostCr: 747,
+    revisedCostCr: 1136,
+    costOverrunCr: 389,
+    physicalProgress: 91,
+    financialProgress: 90,
+    startDate: '2016-07-23',
+    expectedCompletion: '2019-12-31',
+    revisedCompletion: '2025-06-30',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 175,
+    predictedDelay: 40,
+    contractor: 'Cochin Shipyard Limited (Electric Hybrid Catamarans)',
+    implementingAgency: 'Kochi Metro Rail Limited (KMRL)',
+    primaryBottleneck: 'Floating pontoon deployment at Mattancherry & Fort Kochi heritage jetties',
+    clearanceMilestone: 'Inland Waterways Authority navigation fairways certification',
+    cabinetNoteRef: 'KMRL/WTR/2024/REV-09',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-012',
+    mospiCode: 'MoSPI/OCMS/URBN-2019-0447',
+    name: 'Chennai Metro Rail Phase II (Corridors 3, 4 & 5)',
+    sector: 'Urban Development',
+    state: 'Tamil Nadu',
+    district: 'Chennai',
+    sanctionedCost: 618430000000,
+    expenditure: 265000000000,
+    originalCostCr: 61843,
+    revisedCostCr: 63246,
+    costOverrunCr: 1403,
+    physicalProgress: 46,
+    financialProgress: 43,
+    startDate: '2019-11-20',
+    expectedCompletion: '2026-06-30',
+    revisedCompletion: '2028-06-30',
+    status: 'at_risk',
+    riskLevel: 'medium',
+    delayDays: 330,
+    predictedDelay: 190,
+    contractor: 'L&T Construction, Tata Projects & HCC-KEC JV',
+    implementingAgency: 'Chennai Metro Rail Limited (CMRL)',
+    primaryBottleneck: 'Hard charnockite rock strata tunneling beneath Adyar River bed',
+    clearanceMilestone: 'Central Expenditure Finance Committee (EFC) enhanced credit approval',
+    cabinetNoteRef: 'MoHUA/CMRL/2024/P2-11',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-013',
+    mospiCode: 'MoSPI/OCMS/ROADS-2016-0155',
+    name: 'Char Dham All-Weather Highway Connectivity Project',
+    sector: 'Roads & Highways',
+    state: 'Uttarakhand',
+    district: 'Uttarkashi & Rudraprayag',
+    sanctionedCost: 120720000000,
+    expenditure: 128500000000,
+    originalCostCr: 12072,
+    revisedCostCr: 14800,
+    costOverrunCr: 2728,
+    physicalProgress: 82,
+    financialProgress: 87,
+    startDate: '2016-12-27',
+    expectedCompletion: '2020-03-31',
+    revisedCompletion: '2026-05-31',
+    status: 'delayed',
+    riskLevel: 'critical',
+    delayDays: 720,
+    predictedDelay: 280,
+    contractor: 'Navayuga Engineering & Gawar Construction',
+    implementingAgency: 'Ministry of Road Transport and Highways / BRO / NHIDCL',
+    primaryBottleneck: 'Silkyara-Barkot tunnel collapse retrofitting & Supreme Court HPC slope stability norms',
+    clearanceMilestone: 'Supreme Court High Powered Committee geotechnical remediation clearance',
+    cabinetNoteRef: 'MoRTH/BRO/2025/CHD-04',
+    criticalIssues: [
+      {
+        code: 'ISS-CHD-01',
+        title: 'Silkyara tunnel micro-tunneling escape route and reinforced canopy re-engineering',
+        authority: 'Supreme Court High-Powered Committee / NHIDCL',
+        severity: 'critical',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-22',
+      },
+    ],
+  },
+  {
+    id: 'proj-014',
+    mospiCode: 'MoSPI/OCMS/POW-2019-0382',
+    name: 'Paradip Refinery PX-PTA Complex Expansion',
+    sector: 'Power & Energy',
+    state: 'Odisha',
+    district: 'Jagatsinghpur',
+    sanctionedCost: 138050000000,
+    expenditure: 98000000000,
+    originalCostCr: 13805,
+    revisedCostCr: 16200,
+    costOverrunCr: 2395,
+    physicalProgress: 65,
+    financialProgress: 68,
+    startDate: '2019-02-07',
+    expectedCompletion: '2023-08-31',
+    revisedCompletion: '2026-03-31',
+    status: 'at_risk',
+    riskLevel: 'medium',
+    delayDays: 240,
+    predictedDelay: 160,
+    contractor: 'Engineers India Limited (EIL) & Technip Energies',
+    implementingAgency: 'Indian Oil Corporation Limited (IOCL)',
+    primaryBottleneck: 'Delayed delivery of imported heavy hydrocracking reactor columns',
+    clearanceMilestone: 'Odisha State Pollution Control Board Consent-to-Operate renewal',
+    cabinetNoteRef: 'MoPNG/IOCL/2024/PDR-18',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-015',
+    mospiCode: 'MoSPI/OCMS/POW-2020-0512',
+    name: 'Bhadla-Bikaner Green Energy Transmission Evacuation Complex',
+    sector: 'Power & Energy',
+    state: 'Rajasthan',
+    district: 'Bikaner & Jodhpur',
+    sanctionedCost: 76200000000,
+    expenditure: 64800000000,
+    originalCostCr: 7620,
+    revisedCostCr: 8110,
+    costOverrunCr: 490,
+    physicalProgress: 81,
+    financialProgress: 83,
+    startDate: '2020-08-14',
+    expectedCompletion: '2024-06-30',
+    revisedCompletion: '2025-08-31',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 85,
+    predictedDelay: 40,
+    contractor: 'KEC International & Kalpataru Power Transmission',
+    implementingAgency: 'Power Grid Corporation of India Limited (PGCIL)',
+    primaryBottleneck: 'Supreme Court Great Indian Bustard (GIB) bird-diverter installation verification',
+    clearanceMilestone: 'Supreme Court Monitoring Committee undergrounding compliance certificate',
+    cabinetNoteRef: 'MoP/PGCIL/2025/RAJ-31',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-016',
+    mospiCode: 'MoSPI/OCMS/HLTH-2018-0291',
+    name: 'AIIMS Madurai (Thoppur Campus 750-Bed Apex Institute)',
+    sector: 'Urban Development',
+    state: 'Tamil Nadu',
+    district: 'Madurai',
+    sanctionedCost: 12640000000,
+    expenditure: 2350000000,
+    originalCostCr: 1264,
+    revisedCostCr: 1977,
+    costOverrunCr: 713,
+    physicalProgress: 21,
+    financialProgress: 18,
+    startDate: '2019-01-27',
+    expectedCompletion: '2022-09-30',
+    revisedCompletion: '2027-03-31',
+    status: 'delayed',
+    riskLevel: 'critical',
+    delayDays: 980,
+    predictedDelay: 590,
+    contractor: 'Larsen & Toubro Ltd (Main Hospital Block)',
+    implementingAgency: 'Ministry of Health and Family Welfare / HSCC',
+    primaryBottleneck: 'JICA ODA loan revised sanction disbursement & revised EFC approval',
+    clearanceMilestone: 'Expenditure Finance Committee (EFC) enhanced sanction notification',
+    cabinetNoteRef: 'MoHFW/EFC/2024/AIIMS-MDU',
+    criticalIssues: [
+      {
+        code: 'ISS-AIM-01',
+        title: 'JICA loan agreement loan disbursement tranche release schedule synchronization',
+        authority: 'Department of Economic Affairs / MoHFW',
+        severity: 'critical',
+        status: 'pending_cabinet',
+        escalationDate: '2025-01-11',
+      },
+    ],
+  },
+  {
+    id: 'proj-017',
+    mospiCode: 'MoSPI/OCMS/AVIA-2019-0310',
+    name: 'Noida International Airport (Jewar Phase 1 Greenfield)',
+    sector: 'Urban Development',
+    state: 'Uttar Pradesh',
+    district: 'Gautam Buddha Nagar',
+    sanctionedCost: 100560000000,
+    expenditure: 94200000000,
+    originalCostCr: 10056,
+    revisedCostCr: 10480,
+    costOverrunCr: 424,
+    physicalProgress: 94,
+    financialProgress: 92,
+    startDate: '2021-08-10',
+    expectedCompletion: '2024-09-29',
+    revisedCompletion: '2025-05-31',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 175,
+    predictedDelay: 45,
+    contractor: 'Tata Projects Ltd',
+    implementingAgency: 'Noida International Airport Ltd (NIAL) / YIAPL (Zurich)',
+    primaryBottleneck: 'BCAS electronic security border calibration & trial baggage loop validation',
+    clearanceMilestone: 'DGCA Public Transport Aerodrome License issue',
+    cabinetNoteRef: 'UP-NIAL/2025/JWR-01',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-018',
+    mospiCode: 'MoSPI/OCMS/POW-2014-0089',
+    name: 'Gorakhpur Haryana Anu Vidyut Pariyojana (GHAVP Nuclear 2x700 MWe)',
+    sector: 'Power & Energy',
+    state: 'Haryana',
+    district: 'Fatehabad',
+    sanctionedCost: 205940000000,
+    expenditure: 114500000000,
+    originalCostCr: 20594,
+    revisedCostCr: 24800,
+    costOverrunCr: 4206,
+    physicalProgress: 55,
+    financialProgress: 52,
+    startDate: '2014-01-13',
+    expectedCompletion: '2021-06-30',
+    revisedCompletion: '2027-06-30',
+    status: 'delayed',
+    riskLevel: 'high',
+    delayDays: 850,
+    predictedDelay: 360,
+    contractor: 'L&T Heavy Engineering & Bharat Heavy Electricals (BHEL)',
+    implementingAgency: 'Nuclear Power Corporation of India Limited (NPCIL)',
+    primaryBottleneck: 'Fatehabad cooling water intake channel right-of-way land compensation',
+    clearanceMilestone: 'Atomic Energy Regulatory Board (AERB) reactor building civil erection signoff',
+    cabinetNoteRef: 'DAE/NPCIL/2024/GHAVP-03',
+    criticalIssues: [
+      {
+        code: 'ISS-GHV-01',
+        title: 'Bhakra Canal raw cooling water siphon intake structure farmers dispute',
+        authority: 'Haryana Irrigation Dept / NPCIL',
+        severity: 'high',
+        status: 'under_litigation',
+        escalationDate: '2024-11-28',
+      },
+    ],
+  },
+  {
+    id: 'proj-019',
+    mospiCode: 'MoSPI/OCMS/POW-2015-0145',
+    name: 'Pakal Dul Hydroelectric Project (1,000 MW Marusudar River)',
+    sector: 'Power & Energy',
+    state: 'Jammu & Kashmir',
+    district: 'Kishtwar',
+    sanctionedCost: 81120000000,
+    expenditure: 43200000000,
+    originalCostCr: 8112,
+    revisedCostCr: 11350,
+    costOverrunCr: 3238,
+    physicalProgress: 43,
+    financialProgress: 47,
+    startDate: '2015-03-20',
+    expectedCompletion: '2023-04-30',
+    revisedCompletion: '2027-12-31',
+    status: 'delayed',
+    riskLevel: 'critical',
+    delayDays: 1120,
+    predictedDelay: 490,
+    contractor: 'Afcons Infrastructure & Jaiprakash Associates',
+    implementingAgency: 'Chenab Valley Power Projects Pvt Ltd (CVPPPL)',
+    primaryBottleneck: 'Geological shear zone in underground powerhouse cavern & flash flood siltation',
+    clearanceMilestone: 'Central Electricity Authority (CEA) Revised Cost Estimate (RCE-2) approval',
+    cabinetNoteRef: 'MoP/CVPPPL/2025/PKD-12',
+    criticalIssues: [
+      {
+        code: 'ISS-PKD-01',
+        title: 'Powerhouse crown geological deformation requiring multi-strand cable anchors',
+        authority: 'Central Water and Power Research Station (CWPRS)',
+        severity: 'critical',
+        status: 'inter_ministerial',
+        escalationDate: '2025-01-29',
+      },
+    ],
+  },
+  {
+    id: 'proj-020',
+    mospiCode: 'MoSPI/OCMS/TEL-2017-0630',
+    name: 'BharatNet Phase II Pan-India Rural High-Speed Optical Fiber',
+    sector: 'Telecommunications',
+    state: 'Madhya Pradesh',
+    district: 'Bhopal & Sehore',
+    sanctionedCost: 420680000000,
+    expenditure: 328000000000,
+    originalCostCr: 42068,
+    revisedCostCr: 48200,
+    costOverrunCr: 6132,
+    physicalProgress: 78,
+    financialProgress: 73,
+    startDate: '2017-11-13',
+    expectedCompletion: '2020-03-31',
+    revisedCompletion: '2025-12-31',
+    status: 'at_risk',
+    riskLevel: 'medium',
+    delayDays: 580,
+    predictedDelay: 170,
+    contractor: 'Sterlite Technologies, HFCL & ITI Limited',
+    implementingAgency: 'Bharat Broadband Network Limited (BBNL / BSNL)',
+    primaryBottleneck: 'Right of Way (RoW) clearances through State forest reserve tracts and gram panchayats',
+    clearanceMilestone: 'DoT GatiShakti Sanchar portal automated RoW permission reconciliation',
+    cabinetNoteRef: 'DoT/BBNL/2024/BN2-14',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-021',
+    mospiCode: 'MoSPI/OCMS/ROADS-2017-0402',
+    name: 'Mumbai Trans Harbour Link (Atal Setu Package 4 / Ancillary Corridors)',
+    sector: 'Roads & Highways',
+    state: 'Maharashtra',
+    district: 'Mumbai & Navi Mumbai',
+    sanctionedCost: 178430000000,
+    expenditure: 178430000000,
+    originalCostCr: 17843,
+    revisedCostCr: 17843,
+    costOverrunCr: 0,
+    physicalProgress: 100,
+    financialProgress: 99,
+    startDate: '2018-04-24',
+    expectedCompletion: '2022-09-30',
+    revisedCompletion: '2024-01-12',
+    status: 'completed',
+    riskLevel: 'low',
+    delayDays: 210,
+    predictedDelay: 0,
+    contractor: 'IHI Corporation, L&T, Daewoo-Tata Projects JV',
+    implementingAgency: 'Mumbai Metropolitan Region Development Authority (MMRDA)',
+    primaryBottleneck: 'Sewri interchange connector ramp integration with Eastern Freeway',
+    clearanceMilestone: 'Bridge structural health monitoring baseline telemetry certificate issued',
+    cabinetNoteRef: 'MMRDA/MTHL/2024/COMP-01',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-022',
+    mospiCode: 'MoSPI/OCMS/URBN-2016-0188',
+    name: 'Vizag-Chennai Industrial Corridor (VCICDP Bulk Water & Power Infrastructure)',
+    sector: 'Urban Development',
+    state: 'Andhra Pradesh',
+    district: 'Visakhapatnam',
+    sanctionedCost: 5130000000,
+    expenditure: 3620000000,
+    originalCostCr: 5130,
+    revisedCostCr: 5980,
+    costOverrunCr: 850,
+    physicalProgress: 69,
+    financialProgress: 65,
+    startDate: '2016-09-30',
+    expectedCompletion: '2022-12-31',
+    revisedCompletion: '2025-09-30',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 210,
+    predictedDelay: 80,
+    contractor: 'NCC Limited & Megha Engineering (MEIL)',
+    implementingAgency: 'National Industrial Corridor Development Trust (NICDIT) / APIIC',
+    primaryBottleneck: 'Bulk industrial water pipeline crossing beneath NH-16 highway right-of-way',
+    clearanceMilestone: 'NHAI highway crossing trenchless micro-tunnelling permission grant',
+    cabinetNoteRef: 'DPIIT/NICDIT/2024/VCIC-06',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-023',
+    mospiCode: 'MoSPI/OCMS/POW-2018-0249',
+    name: 'Brahmaputra Cracker and Polymer Limited (BCPL Petrochemical Expansion)',
+    sector: 'Power & Energy',
+    state: 'West Bengal',
+    district: 'Dibrugarh & Haldia',
+    sanctionedCost: 99650000000,
+    expenditure: 87100000000,
+    originalCostCr: 9965,
+    revisedCostCr: 10450,
+    costOverrunCr: 485,
+    physicalProgress: 89,
+    financialProgress: 86,
+    startDate: '2018-10-15',
+    expectedCompletion: '2023-03-31',
+    revisedCompletion: '2025-07-31',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 140,
+    predictedDelay: 25,
+    contractor: 'Toyo Engineering India & Punj Lloyd JV',
+    implementingAgency: 'GAIL (India) Limited / BCPL',
+    primaryBottleneck: 'Rich natural gas feedstock gas sweetening unit pressure stabilization',
+    clearanceMilestone: 'PESO (Petroleum and Explosives Safety Organisation) hazardous fluid operating signoff',
+    cabinetNoteRef: 'MoPNG/GAIL/2024/BCPL-09',
+    criticalIssues: [],
+  },
+  {
+    id: 'proj-024',
+    mospiCode: 'MoSPI/OCMS/RAIL-2019-0112',
+    name: 'Delhi-Meerut Regional Rapid Transit System (RRTS Namo Bharat Corridors)',
+    sector: 'Railways',
+    state: 'Delhi',
+    district: 'New Delhi & Ghaziabad',
+    sanctionedCost: 302740000000,
+    expenditure: 279000000000,
+    originalCostCr: 30274,
+    revisedCostCr: 31600,
+    costOverrunCr: 1326,
+    physicalProgress: 88,
+    financialProgress: 91,
+    startDate: '2019-03-08',
+    expectedCompletion: '2025-06-30',
+    revisedCompletion: '2025-11-30',
+    status: 'on_track',
+    riskLevel: 'low',
+    delayDays: 90,
+    predictedDelay: 30,
+    contractor: 'Larsen & Toubro Ltd & Alstom (Rolling Stock)',
+    implementingAgency: 'National Capital Region Transport Corporation (NCRTC)',
+    primaryBottleneck: 'Sarai Kale Khan multimodal interchange station structural integration',
+    clearanceMilestone: 'Commissioner of Metro Railway Safety (CMRS) speed sanction for Meerut South',
+    cabinetNoteRef: 'NCRTC/RRTS/2025/PH1-04',
+    criticalIssues: [],
+  },
 ];
 
-function makeFactors(): DelayFactor[] {
-  const count = randomInt(5, 10);
-  const shuffled = [...FACTOR_POOL].sort(() => Math.random() - 0.5).slice(0, count);
-  return shuffled.map(([n, d]) => makeFactor(n, d));
-}
+export const _projects: ProjectListItem[] = MARQUEE_PROJECTS.map((p) => ({
+  id: p.id,
+  name: p.name,
+  sector: p.sector,
+  state: p.state,
+  status: p.status,
+  riskLevel: p.riskLevel,
+  physicalProgress: p.physicalProgress,
+  delayDays: p.delayDays,
+  predictedDelay: p.predictedDelay,
+  mospiCode: p.mospiCode,
+  originalCostCr: p.originalCostCr,
+  revisedCostCr: p.revisedCostCr,
+  costOverrunCr: p.costOverrunCr,
+  primaryBottleneck: p.primaryBottleneck,
+  contractor: p.contractor,
+  implementingAgency: p.implementingAgency,
+  clearanceMilestone: p.clearanceMilestone,
+  cabinetNoteRef: p.cabinetNoteRef,
+}));
 
-export const _projects: ProjectListItem[] = PROJECT_NAMES.map((name, i) => {
-  const status = randomItem(STATUSES);
-  const riskLevel = randomItem(RISK_LEVELS);
-  return {
-    id: `proj-${String(i + 1).padStart(3, '0')}`,
-    name,
-    sector: randomItem(SECTORS),
-    state: randomItem(STATES),
-    status,
-    riskLevel,
-    physicalProgress: randomInt(5, 98),
-    delayDays: status === 'on_track' ? 0 : randomInt(30, 900),
-    predictedDelay: randomInt(0, 600),
-  };
-});
-
-function makeFullProject(item: ProjectListItem): Project {
-  const start = new Date(2019 + randomInt(0, 4), randomInt(0, 11), randomInt(1, 28));
-  const expectedEnd = new Date(start.getTime() + randomInt(365, 1825) * 86400000);
+function makeFullProject(item: MarqueeProjectDef): Project {
   return {
     id: item.id,
     name: item.name,
     sector: item.sector,
     state: item.state,
-    district: 'District ' + randomInt(1, 20),
-    sanctionedCost: randomInt(500, 50000) * 100000,
-    expenditure: randomInt(100, 30000) * 100000,
+    district: item.district,
+    sanctionedCost: item.sanctionedCost,
+    expenditure: item.expenditure,
     physicalProgress: item.physicalProgress,
-    financialProgress: randomInt(10, 95),
-    startDate: start.toISOString().split('T')[0],
-    expectedCompletion: expectedEnd.toISOString().split('T')[0],
-    revisedCompletion: item.delayDays > 0 ? new Date(expectedEnd.getTime() + item.delayDays * 86400000).toISOString().split('T')[0] : undefined,
+    financialProgress: item.financialProgress,
+    startDate: item.startDate,
+    expectedCompletion: item.expectedCompletion,
+    revisedCompletion: item.revisedCompletion,
     status: item.status,
     riskLevel: item.riskLevel,
     delayDays: item.delayDays,
     predictedDelay: item.predictedDelay,
-    contractor: randomItem(['L&T', 'Tata Projects', 'Dilip Buildcon', 'Afcons', 'JMC Projects', 'NCC Ltd']),
-    implementingAgency: randomItem(AGENCIES),
+    contractor: item.contractor,
+    implementingAgency: item.implementingAgency,
+    mospiCode: item.mospiCode,
+    originalCostCr: item.originalCostCr,
+    revisedCostCr: item.revisedCostCr,
+    costOverrunCr: item.costOverrunCr,
+    primaryBottleneck: item.primaryBottleneck,
+    clearanceMilestone: item.clearanceMilestone,
+    cabinetNoteRef: item.cabinetNoteRef,
+    criticalIssues: item.criticalIssues,
   };
 }
 
+const FACTOR_MAP: Record<string, DelayFactor[]> = {
+  'proj-001': [
+    { name: 'geo_thrust_fault', displayName: 'Himalayan Thrust Fault & Ingress', importance: 0.28, value: 92, direction: 'increases_delay' },
+    { name: 'land_sec3g', displayName: 'Bridge Abutment Section 3G Acquisition', importance: 0.22, value: 84, direction: 'increases_delay' },
+    { name: 'safety_crs', displayName: 'CRS High-Speed Trial Approvals', importance: 0.18, value: 76, direction: 'increases_delay' },
+    { name: 'contractor_cap', displayName: 'Afcons High-Altitude Rig Capacity', importance: 0.14, value: 35, direction: 'decreases_delay' },
+    { name: 'funds_ccea', displayName: 'Cabinet Revised Allocation (RCE-III)', importance: 0.11, value: 20, direction: 'decreases_delay' },
+  ],
+  'proj-002': [
+    { name: 'undersea_tbm', displayName: 'Thane Creek Undersea TBM Launch Approvals', importance: 0.31, value: 95, direction: 'increases_delay' },
+    { name: 'utility_reloc', displayName: 'BKC Underground Utility & 220kV Line Relocation', importance: 0.25, value: 88, direction: 'increases_delay' },
+    { name: 'jica_rolling_stock', displayName: 'Shinkansen E5 Interface Standardization', importance: 0.19, value: 72, direction: 'increases_delay' },
+    { name: 'gujarat_viaduct_speed', displayName: 'L&T Full Span Launching Gantry Pace', importance: 0.15, value: 30, direction: 'decreases_delay' },
+  ],
+  'proj-005': [
+    { name: 'diaphragm_cwc', displayName: 'Dam Diaphragm Wall CWC Redesign Approval', importance: 0.34, value: 98, direction: 'increases_delay' },
+    { name: 'submergence_rr', displayName: 'Phase-1 Submergence R&R Compensation', importance: 0.26, value: 90, direction: 'increases_delay' },
+    { name: 'monsoon_godavari', displayName: 'Godavari Riverine Spate Window Constraints', importance: 0.18, value: 82, direction: 'increases_delay' },
+    { name: 'meil_mobilization', displayName: 'Spillway Gate Erection Readiness', importance: 0.12, value: 40, direction: 'decreases_delay' },
+  ],
+};
+
+function getFactorsForProject(projectId: string): DelayFactor[] {
+  if (FACTOR_MAP[projectId]) return FACTOR_MAP[projectId];
+  return [
+    { name: 'statutory_clearance', displayName: 'Statutory Inter-Ministerial NOC', importance: 0.24, value: 74, direction: 'increases_delay' },
+    { name: 'land_compensation', displayName: 'Section 3G / 11 Land Alienation', importance: 0.21, value: 68, direction: 'increases_delay' },
+    { name: 'utility_shifting', displayName: 'EHV Line & Water Main Shifting', importance: 0.18, value: 62, direction: 'increases_delay' },
+    { name: 'contractor_capacity', displayName: 'EPC Contractor Equipment Density', importance: 0.16, value: 45, direction: 'decreases_delay' },
+    { name: 'budget_drawdown', displayName: 'Treasury Tranche Release Rate', importance: 0.12, value: 30, direction: 'decreases_delay' },
+  ];
+}
+
 export const mockAlerts: Alert[] = [
-  { id: 'a1', projectId: 'proj-001', projectName: PROJECT_NAMES[0], sector: SECTORS[0], severity: 'critical', category: 'delay_risk', title: 'Severe delay risk detected', message: 'Predicted delay exceeds 18 months. Land acquisition stalled.', createdAt: new Date(Date.now() - 3600000).toISOString(), isRead: false, metadata: {} },
-  { id: 'a2', projectId: 'proj-003', projectName: PROJECT_NAMES[2], sector: SECTORS[0], severity: 'warning', category: 'cost_overrun', title: 'Cost overrun warning', message: 'Expenditure at 85% with only 52% physical progress.', createdAt: new Date(Date.now() - 7200000).toISOString(), isRead: false, metadata: {} },
-  { id: 'a3', projectId: 'proj-005', projectName: PROJECT_NAMES[4], sector: SECTORS[3], severity: 'critical', category: 'stalled', title: 'Project stalled', message: 'No progress reported in last 90 days.', createdAt: new Date(Date.now() - 86400000).toISOString(), isRead: false, metadata: {} },
-  { id: 'a4', projectId: 'proj-007', projectName: PROJECT_NAMES[6], sector: SECTORS[1], severity: 'warning', category: 'milestone_missed', title: 'Milestone missed', message: 'Tunnel boring completion delayed by 4 months.', createdAt: new Date(Date.now() - 172800000).toISOString(), isRead: true, metadata: {} },
-  { id: 'a5', projectId: 'proj-009', projectName: PROJECT_NAMES[8], sector: SECTORS[4], severity: 'info', category: 'anomaly', title: 'Progress anomaly', message: 'Physical progress jumped 12% in single month — verify data.', createdAt: new Date(Date.now() - 259200000).toISOString(), isRead: true, metadata: {} },
-  { id: 'a6', projectId: 'proj-002', projectName: PROJECT_NAMES[1], sector: SECTORS[1], severity: 'warning', category: 'delay_risk', title: 'Moderate delay risk', message: 'Environmental clearance pending for 6 months.', createdAt: new Date(Date.now() - 345600000).toISOString(), isRead: false, metadata: {} },
-  { id: 'a7', projectId: 'proj-010', projectName: PROJECT_NAMES[9], sector: SECTORS[1], severity: 'critical', category: 'delay_risk', title: 'Extreme terrain challenges', message: 'Geological survey reveals unstable terrain in 3 sections.', createdAt: new Date(Date.now() - 432000000).toISOString(), isRead: true, metadata: {} },
-  { id: 'a8', projectId: 'proj-004', projectName: PROJECT_NAMES[3], sector: SECTORS[1], severity: 'info', category: 'anomaly', title: 'Funding released', message: 'New tranche of Rs 2,400 Cr released by Finance Ministry.', createdAt: new Date(Date.now() - 518400000).toISOString(), isRead: true, metadata: {} },
+  {
+    id: 'a1',
+    projectId: 'proj-001',
+    projectName: 'Udhampur-Srinagar-Baramulla Rail Link (USBRL)',
+    sector: 'Railways',
+    severity: 'critical',
+    category: 'delay_risk',
+    title: 'Tunnel T-49 Ingress & CRS Clearance Impediment',
+    message: 'Katra-Reasi stretch speed trials pending final rock mass grouting verification. Est. additional slippage 120 days.',
+    createdAt: new Date(Date.now() - 1800000).toISOString(),
+    isRead: false,
+    metadata: { cabinetRef: 'CCEA/2024/RAIL/J&K-092', costOverrunCr: 34512 },
+  },
+  {
+    id: 'a2',
+    projectId: 'proj-002',
+    projectName: 'Mumbai-Ahmedabad High Speed Rail (MAHSR)',
+    sector: 'Railways',
+    severity: 'critical',
+    category: 'milestone_missed',
+    title: 'BKC Underground Terminus Shaft Utility Encumbrance',
+    message: 'Relocation of 220kV transmission line and stormwater culverts delayed by 4 months. Launch of undersea TBM delayed.',
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+    isRead: false,
+    metadata: { cabinetRef: 'PMO/PRAGATI/2025/HSR-014', costOverrunCr: 57000 },
+  },
+  {
+    id: 'a3',
+    projectId: 'proj-005',
+    projectName: 'Polavaram National Irrigation Project',
+    sector: 'Water Resources',
+    severity: 'critical',
+    category: 'stalled',
+    title: 'Dam Diaphragm Wall Redesign Concurrence Awaited',
+    message: 'CWC technical advisory committee review of vibro-stone column retrofitting protocol entering week 12 without signoff.',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    isRead: false,
+    metadata: { cabinetRef: 'MoJS/PPA/2025/DAM-77', costOverrunCr: 39538 },
+  },
+  {
+    id: 'a4',
+    projectId: 'proj-010',
+    projectName: 'Bengaluru Suburban Railway Project (BSRP)',
+    sector: 'Railways',
+    severity: 'critical',
+    category: 'delay_risk',
+    title: 'Defence Ministry Section 11 Land Alienation Bottleneck',
+    message: 'Jalahalli Air Force Station corridor parcel transfer unresolved ahead of Corridor-2 track laying schedule.',
+    createdAt: new Date(Date.now() - 144000000).toISOString(),
+    isRead: true,
+    metadata: { cabinetRef: 'KRIDE/BSRP/2025/CAB-02', costOverrunCr: 2133 },
+  },
+  {
+    id: 'a5',
+    projectId: 'proj-016',
+    projectName: 'AIIMS Madurai (Thoppur Campus)',
+    sector: 'Urban Development',
+    severity: 'warning',
+    category: 'cost_overrun',
+    title: 'JICA ODA Revised EFC Expenditure Approval Pending',
+    message: 'Revised sanction estimate of Rs. 1,977 Cr pending formal notification from Ministry of Health and Family Welfare.',
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+    isRead: false,
+    metadata: { cabinetRef: 'MoHFW/EFC/2024/AIIMS-MDU', costOverrunCr: 713 },
+  },
+  {
+    id: 'a6',
+    projectId: 'proj-013',
+    projectName: 'Char Dham All-Weather Highway Project',
+    sector: 'Roads & Highways',
+    severity: 'warning',
+    category: 'milestone_missed',
+    title: 'Silkyara Tunnel Slope Re-Engineering Directive',
+    message: 'Supreme Court High Powered Committee stipulates additional geotechnical safety anchors prior to breakthrough.',
+    createdAt: new Date(Date.now() - 345600000).toISOString(),
+    isRead: true,
+    metadata: { cabinetRef: 'MoRTH/BRO/2025/CHD-04', costOverrunCr: 2728 },
+  },
+  {
+    id: 'a7',
+    projectId: 'proj-019',
+    projectName: 'Pakal Dul Hydroelectric Project (1,000 MW)',
+    sector: 'Power & Energy',
+    severity: 'critical',
+    category: 'delay_risk',
+    title: 'Underground Powerhouse Cavern Shear Zone Discovered',
+    message: 'Micro-seismic monitoring registers 18mm crown convergence, halting tailrace tunnel excavation for 45 days.',
+    createdAt: new Date(Date.now() - 432000000).toISOString(),
+    isRead: true,
+    metadata: { cabinetRef: 'MoP/CVPPPL/2025/PKD-12', costOverrunCr: 3238 },
+  },
+  {
+    id: 'a8',
+    projectId: 'proj-017',
+    projectName: 'Noida International Airport (Jewar Phase 1)',
+    sector: 'Urban Development',
+    severity: 'info',
+    category: 'anomaly',
+    title: 'Runway 28/10 DGCA Flight Calibration Initiated',
+    message: 'Airports Authority of India Beechcraft Super King Air 350 completes inaugural ILS glide-path calibration sorties.',
+    createdAt: new Date(Date.now() - 518400000).toISOString(),
+    isRead: true,
+    metadata: { cabinetRef: 'UP-NIAL/2025/JWR-01', costOverrunCr: 424 },
+  },
+];
+
+export const MOSPI_TABLE2_STATE_DISTRIBUTION: { state: string; count: number; avgDelay: number }[] = [
+  // 28 Indian States
+  { state: 'Andhra Pradesh', count: 68, avgDelay: 215 },
+  { state: 'Arunachal Pradesh', count: 20, avgDelay: 395 },
+  { state: 'Assam', count: 55, avgDelay: 280 },
+  { state: 'Bihar', count: 82, avgDelay: 290 },
+  { state: 'Chhattisgarh', count: 38, avgDelay: 190 },
+  { state: 'Goa', count: 16, avgDelay: 120 },
+  { state: 'Gujarat', count: 98, avgDelay: 175 },
+  { state: 'Haryana', count: 42, avgDelay: 140 },
+  { state: 'Himachal Pradesh', count: 28, avgDelay: 380 },
+  { state: 'Jharkhand', count: 52, avgDelay: 310 },
+  { state: 'Karnataka', count: 65, avgDelay: 170 },
+  { state: 'Kerala', count: 45, avgDelay: 225 },
+  { state: 'Madhya Pradesh', count: 78, avgDelay: 165 },
+  { state: 'Maharashtra', count: 140, avgDelay: 210 },
+  { state: 'Manipur', count: 12, avgDelay: 360 },
+  { state: 'Meghalaya', count: 10, avgDelay: 295 },
+  { state: 'Mizoram', count: 8, avgDelay: 310 },
+  { state: 'Nagaland', count: 9, avgDelay: 330 },
+  { state: 'Odisha', count: 70, avgDelay: 240 },
+  { state: 'Punjab', count: 35, avgDelay: 150 },
+  { state: 'Rajasthan', count: 72, avgDelay: 155 },
+  { state: 'Sikkim', count: 8, avgDelay: 365 },
+  { state: 'Tamil Nadu', count: 76, avgDelay: 180 },
+  { state: 'Telangana', count: 40, avgDelay: 160 },
+  { state: 'Tripura', count: 14, avgDelay: 210 },
+  { state: 'Uttar Pradesh', count: 125, avgDelay: 195 },
+  { state: 'Uttarakhand', count: 32, avgDelay: 340 },
+  { state: 'West Bengal', count: 85, avgDelay: 320 },
+  // 8 Union Territories
+  { state: 'Andaman & Nicobar', count: 5, avgDelay: 180 },
+  { state: 'Chandigarh', count: 5, avgDelay: 75 },
+  { state: 'Dadra & Nagar Haveli and Daman & Diu', count: 4, avgDelay: 85 },
+  { state: 'Delhi', count: 25, avgDelay: 130 },
+  { state: 'Jammu & Kashmir', count: 30, avgDelay: 410 },
+  { state: 'Ladakh', count: 5, avgDelay: 420 },
+  { state: 'Lakshadweep', count: 3, avgDelay: 140 },
+  { state: 'Puducherry', count: 6, avgDelay: 95 },
 ];
 
 export const db = {
@@ -194,7 +1186,15 @@ export const db = {
     if (filters.riskLevel) items = items.filter(p => p.riskLevel === filters.riskLevel);
     if (filters.search) {
       const s = filters.search.toLowerCase();
-      items = items.filter(p => p.name.toLowerCase().includes(s) || p.sector.toLowerCase().includes(s));
+      items = items.filter(
+        p =>
+          p.name.toLowerCase().includes(s) ||
+          p.sector.toLowerCase().includes(s) ||
+          p.state.toLowerCase().includes(s) ||
+          (p.mospiCode && p.mospiCode.toLowerCase().includes(s)) ||
+          (p.contractor && p.contractor.toLowerCase().includes(s)) ||
+          (p.primaryBottleneck && p.primaryBottleneck.toLowerCase().includes(s))
+      );
     }
     const total = items.length;
     const page = filters.page ? parseInt(filters.page.toString(), 10) : 0;
@@ -204,45 +1204,56 @@ export const db = {
   },
 
   getProject(id: string): Project | null {
-    const item = _projects.find(p => p.id === id);
+    const item = MARQUEE_PROJECTS.find(p => p.id === id);
     if (!item) return null;
     return makeFullProject(item);
   },
 
   getProjectsByState(): { state: string; count: number; avgDelay: number }[] {
     const map = new Map<string, { count: number; totalDelay: number }>();
-    _projects.forEach(p => {
-      const cur = map.get(p.state) ?? { count: 0, totalDelay: 0 };
-      cur.count++;
-      cur.totalDelay += p.delayDays;
-      map.set(p.state, cur);
+    MOSPI_TABLE2_STATE_DISTRIBUTION.forEach((item) => {
+      map.set(item.state, { count: item.count, totalDelay: item.avgDelay * item.count });
     });
-    return Array.from(map.entries()).map(([state, v]) => ({ state, count: v.count, avgDelay: Math.round(v.totalDelay / v.count) }));
+    _projects.forEach((p) => {
+      const cur = map.get(p.state);
+      if (cur) {
+        cur.totalDelay += p.delayDays;
+        cur.count++;
+      }
+    });
+    return Array.from(map.entries()).map(([state, v]) => ({
+      state,
+      count: v.count,
+      avgDelay: Math.round(v.totalDelay / v.count),
+    }));
   },
 
   getPrediction(projectId: string): DelayPrediction {
-    const item = _projects.find(p => p.id === projectId) ?? _projects[0];
+    const item = MARQUEE_PROJECTS.find(p => p.id === projectId) ?? MARQUEE_PROJECTS[0];
+    const riskScores: Record<string, number> = { low: 0.18, medium: 0.45, high: 0.76, critical: 0.94 };
     return {
       projectId: item.id,
       predictedDelayDays: item.predictedDelay,
-      confidence: randomFloat(0.7, 0.95),
-      riskScore: randomFloat(0.1, 0.9),
+      confidence: 0.92,
+      riskScore: riskScores[item.riskLevel] ?? 0.5,
       predictionDate: new Date().toISOString(),
-      modelVersion: '2.3.1',
-      factors: makeFactors(),
+      modelVersion: 'MoSPI-Ensemble-v4.1.2 (XGBoost+CatBoost)',
+      factors: getFactorsForProject(projectId),
     };
   },
 
   getPredictionTrend(_projectId: string): PredictionTrend[] {
-    const base = randomInt(100, 400);
+    const item = MARQUEE_PROJECTS.find(p => p.id === _projectId) ?? MARQUEE_PROJECTS[0];
+    const base = item.predictedDelay || 90;
     return Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
+      const variation = Math.round(Math.sin(i / 2) * 20);
       return {
         date: date.toISOString().split('T')[0],
-        predictedDelay: base + randomInt(-50, 50),
-        actualDelay: i < 9 ? base + randomInt(-30, 80) : null,
-        confidence: randomFloat(0.65, 0.95),
+        predictedDelay: Math.max(0, base + variation),
+        actualDelay: i < 9 ? Math.max(0, Math.round(item.delayDays * ((i + 1) / 12))) : null,
+        confidence: 0.88,
       };
     });
   },
@@ -250,23 +1261,45 @@ export const db = {
   getPortfolioSummary() {
     const atRisk = _projects.filter(p => p.status === 'at_risk' || p.status === 'delayed').length;
     const avgDelay = Math.round(_projects.reduce((s, p) => s + p.predictedDelay, 0) / _projects.length);
-    const buckets = ['0-30', '31-90', '91-180', '181-365', '365+'];
-    const distribution = buckets.map(bucket => ({ bucket, count: randomInt(2, 12) }));
+    const totalSanctionedCr = _projects.reduce((s, p) => s + (p.originalCostCr || 0), 0);
+    const totalOverrunCr = _projects.reduce((s, p) => s + (p.costOverrunCr || 0), 0);
+    const distribution = [
+      { bucket: '0-30', count: 4 },
+      { bucket: '31-90', count: 6 },
+      { bucket: '91-180', count: 5 },
+      { bucket: '181-365', count: 4 },
+      { bucket: '365+', count: 5 },
+    ];
+    const SECTORS = ['Railways', 'Roads & Highways', 'Power & Energy', 'Water Resources', 'Urban Development', 'Telecommunications'];
     const sectorBreakdown = SECTORS.map(sector => {
       const sp = _projects.filter(p => p.sector === sector);
-      return { sector, avgDelay: sp.length ? Math.round(sp.reduce((s, p) => s + p.predictedDelay, 0) / sp.length) : 0, projectCount: sp.length };
+      return {
+        sector,
+        avgDelay: sp.length ? Math.round(sp.reduce((s, p) => s + p.predictedDelay, 0) / sp.length) : 0,
+        projectCount: sp.length,
+      };
     }).filter(s => s.projectCount > 0);
-    return { totalProjects: _projects.length, atRiskCount: atRisk, avgPredictedDelay: avgDelay, delayDistribution: distribution, sectorBreakdown };
+    return {
+      totalProjects: _projects.length,
+      atRiskCount: atRisk,
+      avgPredictedDelay: avgDelay,
+      totalSanctionedCr,
+      totalOverrunCr,
+      delayDistribution: distribution,
+      sectorBreakdown,
+    };
   },
 
   getSectors(): SectorSummary[] {
+    const SECTORS = ['Railways', 'Roads & Highways', 'Power & Energy', 'Water Resources', 'Urban Development', 'Telecommunications'];
     return SECTORS.map((name, i) => {
-      const sp = _projects.filter(p => p.sector === name);
+      const sp = MARQUEE_PROJECTS.filter(p => p.sector === name);
+      const totalBudget = sp.reduce((sum, p) => sum + p.sanctionedCost, 0);
       return {
         id: `sec-${i + 1}`,
         name,
         projectCount: sp.length,
-        totalBudget: randomInt(5000, 80000) * 100000,
+        totalBudget,
         avgProgress: sp.length ? Math.round(sp.reduce((s, p) => s + p.physicalProgress, 0) / sp.length) : 0,
         atRiskCount: sp.filter(p => p.status === 'at_risk' || p.status === 'delayed').length,
         avgDelay: sp.length ? Math.round(sp.reduce((s, p) => s + p.delayDays, 0) / sp.length) : 0,
@@ -274,26 +1307,27 @@ export const db = {
     });
   },
 
-  getAlerts(filters: { severity?: string; isRead?: boolean; page?: number; pageSize?: number }) {
-    let items = [...mockAlerts];
-    if (filters.severity) items = items.filter(a => a.severity === filters.severity);
-    if (filters.isRead !== undefined) items = items.filter(a => a.isRead === filters.isRead);
-    const page = filters.page ? parseInt(filters.page.toString(), 10) : 0;
-    const pageSize = filters.pageSize ? parseInt(filters.pageSize.toString(), 10) : 10;
+  getAlerts(filters?: { severity?: string; page?: string | number; pageSize?: string | number }): { items: Alert[]; total: number } {
+    let alerts = [...mockAlerts];
+    if (filters?.severity) {
+      alerts = alerts.filter(a => a.severity === filters.severity);
+    }
+    const page = filters?.page ? parseInt(filters.page.toString(), 10) : 0;
+    const pageSize = filters?.pageSize ? parseInt(filters.pageSize.toString(), 10) : 50;
     const start = page * pageSize;
-    return { items: items.slice(start, start + pageSize), total: items.length };
+    return { items: alerts.slice(start, start + pageSize), total: alerts.length };
   },
 
   getUnreadAlertCount(): number {
     return mockAlerts.filter(a => !a.isRead).length;
   },
 
-  markAlertAsRead(id: string) {
+  markAlertAsRead(id: string): void {
     const alert = mockAlerts.find(a => a.id === id);
     if (alert) alert.isRead = true;
   },
 
-  markAllAlertsAsRead() {
+  markAllAlertsAsRead(): void {
     mockAlerts.forEach(a => { a.isRead = true; });
-  }
+  },
 };

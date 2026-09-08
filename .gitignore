@@ -8,3 +8,10 @@ backend/node_modules/
 .DS_Store
 *.tsbuildinfo
 uploads/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
