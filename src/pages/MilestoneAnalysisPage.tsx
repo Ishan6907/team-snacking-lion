@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -33,6 +33,7 @@ import CabinetEscalationDialog from '@/components/common/CabinetEscalationDialog
 import LiquidatedDamagesDialog from '@/components/common/LiquidatedDamagesDialog';
 import InterAgencySummitDialog from '@/components/common/InterAgencySummitDialog';
 import { ALL_1428_PROJECTS, ProjectRow } from '@/data/inventoryData';
+import { recommendationsApi } from '@/api/recommendations';
 
 export default function MilestoneAnalysisPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -205,6 +206,42 @@ export default function MilestoneAnalysisPage() {
       { name: 'Power Line & Utility Shifting NOC', status: 'COMPLETED', color: '#15803d', desc: 'Discom & Transmission line relocation certified on site' },
     ];
   }, [project]);
+
+  // Recommendations Logic
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [recsLoading, setRecsLoading] = useState(false);
+  const [recsSource, setRecsSource] = useState<'gemini' | 'static'>('static');
+
+  const fetchRecommendations = async () => {
+    setRecsLoading(true);
+    try {
+      const factorsData = shapFactors.map((f) => ({
+        name: f.name,
+        importance: parseFloat(f.weight) || 0,
+        direction: 'increase',
+      }));
+
+      const res = await recommendationsApi.getRecommendations({
+        projectName: project.name,
+        sector: project.sector,
+        state: project.state,
+        delayDays: project.predictedDelayDays,
+        riskLevel: project.riskSeverity,
+        primaryBottleneck: project.criticalBlocker,
+        factors: factorsData,
+      });
+      setRecommendations(res.recommendations);
+      setRecsSource(res.source);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRecsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [project.id]);
 
   return (
     <Box sx={{ color: '#0f172a', pb: 4 }}>
@@ -789,6 +826,47 @@ export default function MilestoneAnalysisPage() {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Corrective Actions Recommendations Panel */}
+      <Paper elevation={0} sx={{ p: 2.5, mt: 2, mb: 4, borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.85rem' }}>
+            Corrective Actions &amp; Recommendations
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {!recsLoading && recommendations.length > 0 && (
+              <Chip 
+                label={recsSource === 'gemini' ? 'AI-Generated' : 'Rule-Based'} 
+                size="small" 
+                sx={{ 
+                  height: 20, fontSize: '0.62rem', fontWeight: 800,
+                  bgcolor: recsSource === 'gemini' ? '#dcfce7' : '#eff6ff', 
+                  color: recsSource === 'gemini' ? '#15803d' : '#0284c7'
+                }} 
+              />
+            )}
+            <Button size="small" variant="outlined" onClick={fetchRecommendations} disabled={recsLoading} sx={{ height: 24, fontSize: '0.65rem' }}>
+              Refresh
+            </Button>
+          </Stack>
+        </Stack>
+
+        {recsLoading ? (
+          <Typography variant="body2" sx={{ color: '#64748b' }}>Loading recommendations...</Typography>
+        ) : recommendations.length > 0 ? (
+          <Stack spacing={1.5} component="ol" sx={{ m: 0, pl: 2, color: '#475569' }}>
+            {recommendations.map((rec, idx) => (
+              <li key={idx}>
+                <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>
+                  {rec}
+                </Typography>
+              </li>
+            ))}
+          </Stack>
+        ) : (
+          <Typography variant="body2" sx={{ color: '#64748b' }}>No recommendations available.</Typography>
+        )}
+      </Paper>
 
       {/* Interactive Sovereign Action Dialogs */}
       <CabinetEscalationDialog

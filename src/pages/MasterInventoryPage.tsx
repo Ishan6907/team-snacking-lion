@@ -13,6 +13,7 @@ import {
   Checkbox,
   LinearProgress,
   Divider,
+  Slider,
 } from '@mui/material';
 import {
   Search,
@@ -49,6 +50,8 @@ export default function MasterInventoryPage() {
   const [stateSelect, setStateSelect] = useState('all');
   const [contractorSelect, setContractorSelect] = useState('all');
   const [budgetSelect, setBudgetSelect] = useState('all');
+
+  const [confidenceSelect, setConfidenceSelect] = useState<number>(75);
 
   // Modal dialog states
   const [comparisonOpen, setComparisonOpen] = useState(false);
@@ -95,6 +98,9 @@ export default function MasterInventoryPage() {
   // Dynamic Filtering Logic
   const filteredProjects = useMemo(() => {
     return ALL_1428_PROJECTS.filter((p) => {
+      // 0. Confidence Filter
+      if (p.confidencePct < confidenceSelect) return false;
+
       // 1. Quick status filter chips (driven dynamically by user-configured delay thresholds)
       if (statusFilter === 'critical' && p.predictedDelayDays < thresholds.criticalDelay) return false;
       if (statusFilter === 'moderate' && (p.predictedDelayDays < thresholds.warningDelay || p.predictedDelayDays >= thresholds.criticalDelay)) return false;
@@ -135,7 +141,7 @@ export default function MasterInventoryPage() {
       }
       return true;
     });
-  }, [statusFilter, sectorSelect, stateSelect, contractorSelect, budgetSelect, searchQuery, thresholds.criticalDelay, thresholds.warningDelay]);
+  }, [statusFilter, sectorSelect, stateSelect, contractorSelect, budgetSelect, searchQuery, thresholds.criticalDelay, thresholds.warningDelay, confidenceSelect]);
 
   // Total pages
   const totalPages = Math.max(1, Math.ceil(filteredProjects.length / pageSize));
@@ -449,7 +455,27 @@ export default function MasterInventoryPage() {
       {/* Filter Ribbon 2: Faceted Dropdowns + Search */}
       <Paper elevation={0} sx={{ p: 1.5, mb: 1.5, borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
         <Grid container spacing={1.5} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
+            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem', display: 'block', mb: 0.5 }}>
+              Minimum Model Confidence
+            </Typography>
+            <Slider
+              value={confidenceSelect}
+              onChange={(_, newValue) => {
+                setConfidenceSelect(newValue as number);
+                setPage(1);
+              }}
+              min={50}
+              max={98}
+              step={1}
+              valueLabelDisplay="auto"
+              size="small"
+            />
+            <Typography variant="caption" sx={{ color: '#0f172a', fontSize: '0.65rem', display: 'block' }}>
+              Showing {filteredProjects.length} of {ALL_1428_PROJECTS.length} projects above {confidenceSelect}% confidence
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={3}>
             <TextField
               fullWidth
               size="small"

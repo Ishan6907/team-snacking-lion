@@ -73,6 +73,12 @@ NUMERICAL_FEATURES = [
     'gatc_test_centre_lead_days',
     'packaged_commodities_audit_risk',
     'jan_vishwas_relief_index',
+    'rfctlarr_stage',
+    'affected_families_count',
+    'compensation_disbursed_pct',
+    'rr_plan_status',
+    'legal_disputes_count',
+    'documentation_completeness',
 ]
 
 # Region mapping for 36 States & UTs

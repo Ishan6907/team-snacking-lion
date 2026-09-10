@@ -10,6 +10,9 @@ import alertRoutes from './routes/alerts';
 import uploadRoutes from './routes/upload';
 import reportRoutes from './routes/reports';
 import mlRoutes from './routes/ml';
+import recommendationRoutes from './routes/recommendations';
+
+import { requireRole } from './routes/auth';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -17,15 +20,25 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
-// API Routes
+// Auth routes — public (login, register, etc.)
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/projects', projectRoutes);
-app.use('/api/v1/predictions', predictionRoutes);
-app.use('/api/v1/sectors', sectorRoutes);
-app.use('/api/v1/alerts', alertRoutes);
-app.use('/api/v1/upload', uploadRoutes);
-app.use('/api/v1/reports', reportRoutes);
-app.use('/api/v1/ml', mlRoutes);
+
+import districtRoutes from './routes/districts';
+
+// Authenticated routes — require any valid role
+const requireAuth = requireRole('admin', 'analyst', 'viewer');
+app.use('/api/v1/projects', requireAuth, projectRoutes);
+app.use('/api/v1/predictions', requireAuth, predictionRoutes);
+app.use('/api/v1/sectors', requireAuth, sectorRoutes);
+app.use('/api/v1/alerts', requireAuth, alertRoutes);
+app.use('/api/v1/recommendations', requireAuth, recommendationRoutes);
+app.use('/api/v1/districts', requireAuth, districtRoutes);
+
+// Analyst/Admin routes — require elevated permissions
+const requireAnalyst = requireRole('admin', 'analyst');
+app.use('/api/v1/upload', requireAnalyst, uploadRoutes);
+app.use('/api/v1/reports', requireAnalyst, reportRoutes);
+app.use('/api/v1/ml', requireAnalyst, mlRoutes);
 
 // Static frontend serving in production
 if (process.env.NODE_ENV === 'production') {

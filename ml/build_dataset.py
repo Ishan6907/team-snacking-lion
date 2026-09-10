@@ -157,6 +157,14 @@ for i, p in enumerate(raw_projects):
     utility_shifting = round(float(rng.uniform(30.0, 100.0)), 1)
     contractor_liq = round(float(rng.uniform(0.65, 2.20)), 2)
 
+    # 6 New Land Acquisition Features
+    rfctlarr_stage = int(rng.choice([4, 5]) if land_acq_delay_months <= 6 else rng.choice([0, 1, 2]))
+    affected_families_count = int(rng.randint(500, 5000) if outlay_cr > 1000 else rng.randint(0, 500))
+    compensation_disbursed_pct = round(float(rng.uniform(0.6, 1.0) if rfctlarr_stage >= 4 else rng.uniform(0.0, 0.4)), 2)
+    rr_plan_status = int(rng.choice([2, 3]) if rfctlarr_stage >= 4 else rng.choice([0, 1]))
+    legal_disputes_count = int(rng.randint(5, 50) if land_acq_delay_months > 12 else rng.randint(0, 5))
+    documentation_completeness = round(float(rng.uniform(0.8, 1.0) if land_acq_delay_months <= 6 else rng.uniform(0.2, 0.6)), 2)
+
     # 2. Ingest Legal Metrology Regulatory Corpus Features
     m_params = SECTOR_METROLOGY_PARAMS.get(sector, {'weighbridge_base': 30.0, 'pcr_audit_risk': 0.40, 'compliance_base': 0.65})
     gatc_lead = round(get_gatc_lead(start_date.year, rng), 1)
@@ -177,6 +185,9 @@ for i, p in enumerate(raw_projects):
         0.10 * (weighbridge_gap / 50.0) -
         0.14 * jan_vishwas +
         (0.16 if sector in ['Railways', 'Water'] else 0.0) +
+        0.15 * ((5 - rfctlarr_stage) / 5.0) +
+        0.10 * (legal_disputes_count / 50.0) -
+        0.12 * documentation_completeness +
         rng.normal(0, 0.28)
     )
 
@@ -227,6 +238,12 @@ for i, p in enumerate(raw_projects):
         'gatc_test_centre_lead_days': round(gatc_lead, 1),
         'packaged_commodities_audit_risk': round(pcr_risk, 3),
         'jan_vishwas_relief_index': round(jan_vishwas, 2),
+        'rfctlarr_stage': rfctlarr_stage,
+        'affected_families_count': affected_families_count,
+        'compensation_disbursed_pct': compensation_disbursed_pct,
+        'rr_plan_status': rr_plan_status,
+        'legal_disputes_count': legal_disputes_count,
+        'documentation_completeness': documentation_completeness,
         'delay_days': delay_days,
         'status': status,
         'label': label,

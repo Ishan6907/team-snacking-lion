@@ -17,6 +17,7 @@ export interface ProjectRow {
   criticalBlocker: string;
   contractor: string;
   sector: 'Highways' | 'Railways' | 'Power' | 'Water' | 'Urban Development';
+  district: string;
 }
 
 export const ALL_INDIAN_STATES_AND_UTS = [
@@ -81,6 +82,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'MoEFCC Stage II Clear. Ch. 214+000',
     contractor: 'Dilip Buildcon Ltd.',
     sector: 'Highways',
+    district: 'Surat',
   },
   {
     id: 'DFCCIL-EDFC-PKG-201',
@@ -101,6 +103,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'Power Grid Relocation Crossing 4 sites',
     contractor: 'L&T Construction',
     sector: 'Railways',
+    district: 'Aligarh',
   },
   {
     id: 'PGCIL-HVDC-RAIGARH',
@@ -121,6 +124,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'NR / Substation Testing Ready for commissioning',
     contractor: 'Kalpataru Power Transmission',
     sector: 'Power',
+    district: 'Raigarh',
   },
   {
     id: 'JJM-UP-BUND-08',
@@ -141,6 +145,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'State Tranche Hold (₹131 Cr unreleased)',
     contractor: 'NCC Limited',
     sector: 'Water',
+    district: 'Banda',
   },
   {
     id: 'NHAI-BLR-CHE-EXP-02',
@@ -161,6 +166,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'ROB Clearance SWR GAD approval pending',
     contractor: 'Tata Projects',
     sector: 'Highways',
+    district: 'Kolar',
   },
   {
     id: 'NHAI-VR-EXP-PKG-01',
@@ -181,6 +187,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: '3A/3D Land Acq Gazette CALA Dhanbad stalled',
     contractor: 'Afcons Infrastructure',
     sector: 'Highways',
+    district: 'Ranchi',
   },
   {
     id: 'MMRDA-MUM-LINE-4',
@@ -201,6 +208,7 @@ const SEED_PROJECTS: ProjectRow[] = [
     criticalBlocker: 'Depot Land Possession Mogharpada litigation',
     contractor: 'Reliance Infra - Astaldi JV',
     sector: 'Urban Development',
+    district: 'Thane',
   },
 ];
 
@@ -672,6 +680,49 @@ function generateAll1428Projects(): ProjectRow[] {
       const contractMode = CONTRACT_MODES[Math.floor(rand() * CONTRACT_MODES.length)];
       const fullName = `${projectArchetype.name} (Pkg ${packageNum}${subCode} - ${spec.state})`;
 
+      const DISTRICTS_BY_STATE: Record<string, string[]> = {
+        'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore', 'Kurnool', 'Kadapa', 'Rajahmundry'],
+        'Arunachal Pradesh': ['Tawang', 'Itanagar', 'Ziro', 'Pasighat', 'Bomdila'],
+        'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tezpur'],
+        'Bihar': ['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Purnia', 'Darbhanga', 'Begusarai'],
+        'Chhattisgarh': ['Raipur', 'Bhilai', 'Bilaspur', 'Korba', 'Raigarh', 'Rajnandgaon'],
+        'Goa': ['North Goa', 'South Goa', 'Panaji', 'Margao'],
+        'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Gandhinagar', 'Junagadh'],
+        'Haryana': ['Faridabad', 'Gurugram', 'Panipat', 'Ambala', 'Rohtak', 'Hisar', 'Karnal'],
+        'Himachal Pradesh': ['Shimla', 'Mandi', 'Dharamshala', 'Solan', 'Kullu'],
+        'Jharkhand': ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Hazaribagh', 'Deoghar'],
+        'Karnataka': ['Bengaluru Urban', 'Mysuru', 'Hubballi', 'Mangaluru', 'Belagavi', 'Kalaburagi', 'Ballari'],
+        'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kannur', 'Kollam'],
+        'Madhya Pradesh': ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar', 'Rewa'],
+        'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad', 'Solapur', 'Amravati'],
+        'Manipur': ['Imphal', 'Churachandpur', 'Thoubal', 'Bishnupur'],
+        'Meghalaya': ['Shillong', 'Tura', 'Jowai', 'Nongpoh'],
+        'Mizoram': ['Aizawl', 'Lunglei', 'Champhai', 'Kolasib'],
+        'Nagaland': ['Dimapur', 'Kohima', 'Mokokchung', 'Tuensang'],
+        'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Brahmapur', 'Sambalpur', 'Puri', 'Balasore'],
+        'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Pathankot'],
+        'Rajasthan': ['Jaipur', 'Jodhpur', 'Kota', 'Bikaner', 'Ajmer', 'Udaipur', 'Bhilwara', 'Alwar'],
+        'Sikkim': ['Gangtok', 'Namchi', 'Gyalshing', 'Mangan'],
+        'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Vellore', 'Erode'],
+        'Telangana': ['Hyderabad', 'Warangal', 'Nizamabad', 'Khammam', 'Karimnagar', 'Ramagundam', 'Mahbubnagar'],
+        'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailashahar'],
+        'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi', 'Meerut', 'Prayagraj', 'Bareilly', 'Aligarh'],
+        'Uttarakhand': ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Rudrapur', 'Kashipur'],
+        'West Bengal': ['Kolkata', 'Howrah', 'Asansol', 'Siliguri', 'Durgapur', 'Bardhaman', 'Malda', 'Kharagpur'],
+        'Andaman & Nicobar': ['Port Blair', 'Nicobar', 'North & Middle Andaman'],
+        'Chandigarh': ['Chandigarh'],
+        'Dadra & Nagar Haveli': ['Silvassa', 'Daman', 'Diu'],
+        'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi'],
+        'Jammu & Kashmir': ['Srinagar', 'Jammu', 'Anantnag', 'Baramulla', 'Kathua', 'Udhampur'],
+        'Ladakh': ['Leh', 'Kargil'],
+        'Lakshadweep': ['Kavaratti', 'Agatti', 'Minicoy'],
+        'Puducherry': ['Puducherry', 'Karaikal', 'Mahe', 'Yanam']
+      };
+
+      const defaultDistricts = ['District 1', 'District 2', 'District 3'];
+      const stateDistricts = DISTRICTS_BY_STATE[spec.state] || defaultDistricts;
+      const district = stateDistricts[i % stateDistricts.length];
+
       result.push({
         id,
         name: fullName,
@@ -691,6 +742,7 @@ function generateAll1428Projects(): ProjectRow[] {
         criticalBlocker,
         contractor: projectArchetype.contractor,
         sector: projectArchetype.sector,
+        district,
       });
     }
   });

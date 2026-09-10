@@ -36,6 +36,7 @@ import {
   AssignmentTurnedIn,
   Gavel,
   CheckCircle,
+  Science,
 } from '@mui/icons-material';
 import { useAuth } from '@/context/AuthContext';
 import PaimanaLogo from '@/components/common/PaimanaLogo';
@@ -201,6 +202,24 @@ export default function DashboardLayout() {
             <ListItemText primary="CapEx Monte Carlo Model" primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 600 }} />
           </ListItemButton>
         </ListItem>
+
+        <ListItem disablePadding sx={{ mb: 0.4 }}>
+          <ListItemButton
+            selected={location.pathname === '/how-it-works'}
+            onClick={() => navigate('/how-it-works')}
+            sx={{
+              borderRadius: 1,
+              py: 0.7,
+              px: 1.2,
+              '&.Mui-selected': { bgcolor: '#0f172a', color: '#ffffff', '& .MuiListItemIcon-root': { color: '#ffffff' } },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 28, color: location.pathname === '/how-it-works' ? '#ffffff' : '#64748b' }}>
+              <Science sx={{ fontSize: 17 }} />
+            </ListItemIcon>
+            <ListItemText primary="How It Works" primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 600 }} />
+          </ListItemButton>
+        </ListItem>
       </List>
 
       <Divider sx={{ my: 1.5, borderColor: '#e2e8f0' }} />
@@ -307,10 +326,10 @@ export default function DashboardLayout() {
           <CheckCircle sx={{ fontSize: 16, color: '#15803d' }} />
           <Box>
             <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.72rem', display: 'block' }}>
-              NIC BharatNet v2
+              Problem Statement 11 &bull; SIH 2026
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem' }}>
-              Secure GovNet Gateway
+              Explainable AI &bull; NIC BharatNet
             </Typography>
           </Box>
         </Stack>
@@ -597,9 +616,18 @@ export default function DashboardLayout() {
           mt: '94px',
           bgcolor: '#f1f5f9',
           minHeight: 'calc(100vh - 94px)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Outlet />
+        <Box sx={{ flexGrow: 1 }}>
+          <Outlet />
+        </Box>
+        <Box sx={{ mt: 3, pt: 1.5, pb: 1, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem' }}>
+            Smart India Hackathon 2026 &bull; Problem Statement 11: Explainable AI techniques to ensure transparency in prediction results
+          </Typography>
+        </Box>
       </Box>
 
       {/* Global Command Search Modal (Ctrl+K) */}

@@ -1245,15 +1245,21 @@ export const db = {
   getPredictionTrend(_projectId: string): PredictionTrend[] {
     const item = MARQUEE_PROJECTS.find(p => p.id === _projectId) ?? MARQUEE_PROJECTS[0];
     const base = item.predictedDelay || 90;
+    // Seed variation from projectId so each project gets a unique trend shape
+    const seed = _projectId.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+    const phase = (Math.abs(seed) % 100) / 15;
+    const amplitude = 10 + (Math.abs(seed >> 4) % 25);
+    const drift = ((seed >> 8) % 7) - 3;
     return Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
-      const variation = Math.round(Math.sin(i / 2) * 20);
+      const variation = Math.round(Math.sin((i + phase) / 2.3) * amplitude + drift * (i / 4));
+      const growthFactor = 0.3 + (Math.abs(seed >> 2) % 70) / 100;
       return {
         date: date.toISOString().split('T')[0],
         predictedDelay: Math.max(0, base + variation),
-        actualDelay: i < 9 ? Math.max(0, Math.round(item.delayDays * ((i + 1) / 12))) : null,
-        confidence: 0.88,
+        actualDelay: i < 9 ? Math.max(0, Math.round(item.delayDays * ((i + 1) / 12) * growthFactor + variation * 0.4)) : null,
+        confidence: +(0.78 + (Math.abs(seed + i) % 18) / 100).toFixed(2),
       };
     });
   },
@@ -1264,11 +1270,11 @@ export const db = {
     const totalSanctionedCr = _projects.reduce((s, p) => s + (p.originalCostCr || 0), 0);
     const totalOverrunCr = _projects.reduce((s, p) => s + (p.costOverrunCr || 0), 0);
     const distribution = [
-      { bucket: '0-30', count: 4 },
-      { bucket: '31-90', count: 6 },
-      { bucket: '91-180', count: 5 },
-      { bucket: '181-365', count: 4 },
-      { bucket: '365+', count: 5 },
+      { bucket: '0-30', count: _projects.filter(p => p.predictedDelay <= 30).length },
+      { bucket: '31-90', count: _projects.filter(p => p.predictedDelay > 30 && p.predictedDelay <= 90).length },
+      { bucket: '91-180', count: _projects.filter(p => p.predictedDelay > 90 && p.predictedDelay <= 180).length },
+      { bucket: '181-365', count: _projects.filter(p => p.predictedDelay > 180 && p.predictedDelay <= 365).length },
+      { bucket: '365+', count: _projects.filter(p => p.predictedDelay > 365).length },
     ];
     const SECTORS = ['Railways', 'Roads & Highways', 'Power & Energy', 'Water Resources', 'Urban Development', 'Telecommunications'];
     const sectorBreakdown = SECTORS.map(sector => {
@@ -1330,4 +1336,8 @@ export const db = {
   markAllAlertsAsRead(): void {
     mockAlerts.forEach(a => { a.isRead = true; });
   },
+
+  addAlert(alert: Alert): void {
+    mockAlerts.unshift(alert);
+  }
 };

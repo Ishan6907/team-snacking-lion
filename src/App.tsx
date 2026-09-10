@@ -16,6 +16,7 @@ import LandVerificationPage from '@/pages/LandVerificationPage';
 import ForestClearancePage from '@/pages/ForestClearancePage';
 import ArbitrationClaimsPage from '@/pages/ArbitrationClaimsPage';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import HowItWorksPage from '@/pages/HowItWorksPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="sectors" element={<SectorsPage />} />
         <Route path="sectors/:sectorId" element={<SectorDetailPage />} />
         <Route path="projects/:projectId" element={<MilestoneAnalysisPage />} />
+        <Route path="how-it-works" element={<HowItWorksPage />} />
         <Route path="alerts" element={<AlertsPage />} />
         <Route path="upload" element={<UploadPage />} />
         <Route path="settings" element={<SettingsPage />} />

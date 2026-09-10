@@ -932,13 +932,37 @@ const FACTOR_MAP: Record<string, DelayFactor[]> = {
 
 function getFactorsForProject(projectId: string): DelayFactor[] {
   if (FACTOR_MAP[projectId]) return FACTOR_MAP[projectId];
-  return [
-    { name: 'statutory_clearance', displayName: 'Statutory Inter-Ministerial NOC', importance: 0.24, value: 74, direction: 'increases_delay' },
-    { name: 'land_compensation', displayName: 'Section 3G / 11 Land Alienation', importance: 0.21, value: 68, direction: 'increases_delay' },
-    { name: 'utility_shifting', displayName: 'EHV Line & Water Main Shifting', importance: 0.18, value: 62, direction: 'increases_delay' },
-    { name: 'contractor_capacity', displayName: 'EPC Contractor Equipment Density', importance: 0.16, value: 45, direction: 'decreases_delay' },
-    { name: 'budget_drawdown', displayName: 'Treasury Tranche Release Rate', importance: 0.12, value: 30, direction: 'decreases_delay' },
+  // Generate project-specific factors using a hash of projectId as seed
+  const hash = projectId.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+  const allFactors: Array<{ name: string; displayName: string; direction: 'increases_delay' | 'decreases_delay' }> = [
+    { name: 'statutory_clearance', displayName: 'Statutory Inter-Ministerial NOC', direction: 'increases_delay' },
+    { name: 'land_compensation', displayName: 'Section 3G / 11 Land Alienation', direction: 'increases_delay' },
+    { name: 'utility_shifting', displayName: 'EHV Line & Water Main Shifting', direction: 'increases_delay' },
+    { name: 'monsoon_window', displayName: 'IMD Monsoon Working-Day Window', direction: 'increases_delay' },
+    { name: 'geo_difficulty', displayName: 'Terrain & Geological Difficulty', direction: 'increases_delay' },
+    { name: 'expenditure_gap', displayName: 'Expenditure-to-Sanction Ratio Gap', direction: 'increases_delay' },
+    { name: 'contractor_capacity', displayName: 'EPC Contractor Equipment Density', direction: 'decreases_delay' },
+    { name: 'budget_drawdown', displayName: 'Treasury Tranche Release Rate', direction: 'decreases_delay' },
+    { name: 'progress_momentum', displayName: 'Physical Progress Momentum', direction: 'decreases_delay' },
+    { name: 'metrology_compliance', displayName: 'Legal Metrology Compliance', direction: 'increases_delay' },
   ];
+  // Deterministic shuffle based on seed
+  const shuffled = allFactors.slice().sort((a, b) => {
+    const ka = (hash * a.name.charCodeAt(0)) & 0xffffff;
+    const kb = (hash * b.name.charCodeAt(0)) & 0xffffff;
+    return ka - kb;
+  });
+  const picked = shuffled.slice(0, 5);
+  // Generate project-specific importances
+  const rawWeights = picked.map((_, i) => 30 - i * 5 + (Math.abs(hash >> (i * 3)) % 8));
+  const total = rawWeights.reduce((s, w) => s + w, 0);
+  return picked.map((f, i) => ({
+    name: f.name,
+    displayName: f.displayName,
+    importance: +(rawWeights[i] / total).toFixed(2),
+    value: 20 + (Math.abs(hash >> (i * 2 + 1)) % 70),
+    direction: f.direction,
+  }));
 }
 
 const _mockAlerts: Alert[] = [
@@ -1106,15 +1130,21 @@ export const mockData = {
   getPredictionTrend(projectId: string): PredictionTrend[] {
     const item = MARQUEE_PROJECTS.find(p => p.id === projectId) ?? MARQUEE_PROJECTS[0];
     const base = item.predictedDelay || 90;
+    // Seed variation from projectId so each project gets a unique trend shape
+    const seed = projectId.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+    const phase = (Math.abs(seed) % 100) / 15;        // unique phase offset
+    const amplitude = 10 + (Math.abs(seed >> 4) % 25); // unique amplitude 10-35
+    const drift = ((seed >> 8) % 7) - 3;               // unique drift per month (-3 to +3)
     return Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
-      const variation = Math.round(Math.sin(i / 2) * 20);
+      const variation = Math.round(Math.sin((i + phase) / 2.3) * amplitude + drift * (i / 4));
+      const growthFactor = 0.3 + (Math.abs(seed >> 2) % 70) / 100; // 0.3 to 1.0
       return {
         date: date.toISOString().split('T')[0],
         predictedDelay: Math.max(0, base + variation),
-        actualDelay: i < 9 ? Math.max(0, Math.round(item.delayDays * ((i + 1) / 12))) : null,
-        confidence: 0.88,
+        actualDelay: i < 9 ? Math.max(0, Math.round(item.delayDays * ((i + 1) / 12) * growthFactor + variation * 0.4)) : null,
+        confidence: +(0.78 + (Math.abs(seed + i) % 18) / 100).toFixed(2),
       };
     });
   },
@@ -1123,11 +1153,11 @@ export const mockData = {
     const atRisk = _projects.filter(p => p.status === 'at_risk' || p.status === 'delayed').length;
     const avgDelay = Math.round(_projects.reduce((s, p) => s + p.predictedDelay, 0) / _projects.length);
     const distribution = [
-      { bucket: '0-30', count: 4 },
-      { bucket: '31-90', count: 6 },
-      { bucket: '91-180', count: 5 },
-      { bucket: '181-365', count: 4 },
-      { bucket: '365+', count: 5 },
+      { bucket: '0-30', count: _projects.filter(p => p.predictedDelay <= 30).length },
+      { bucket: '31-90', count: _projects.filter(p => p.predictedDelay > 30 && p.predictedDelay <= 90).length },
+      { bucket: '91-180', count: _projects.filter(p => p.predictedDelay > 90 && p.predictedDelay <= 180).length },
+      { bucket: '181-365', count: _projects.filter(p => p.predictedDelay > 180 && p.predictedDelay <= 365).length },
+      { bucket: '365+', count: _projects.filter(p => p.predictedDelay > 365).length },
     ];
     const SECTORS = ['Railways', 'Roads & Highways', 'Power & Energy', 'Water Resources', 'Urban Development', 'Telecommunications'];
     const sectorBreakdown = SECTORS.map(sector => {

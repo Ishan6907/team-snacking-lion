@@ -17,6 +17,13 @@ router.patch('/:id/read', (req, res) => {
   res.json({ success: true });
 });
 
+import { generateAlerts } from '../services/alertEngine';
+
+router.post('/generate', (req, res) => {
+  const result = generateAlerts();
+  res.json(result);
+});
+
 router.get('/', (req, res) => {
   res.json(db.getAlerts(req.query));
 });

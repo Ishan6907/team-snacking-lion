@@ -405,7 +405,7 @@ export default function LoginPage() {
       {/* Official Gov Footer */}
       <Box sx={{ py: 1.5, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
         <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem' }}>
-          National Informatics Centre &bull; Ministry of Statistics and Programme Implementation, New Delhi &bull; Smart India Hackathon 2026
+          National Informatics Centre &bull; Ministry of Statistics and Programme Implementation, New Delhi &bull; Smart India Hackathon 2026 &bull; Problem Statement 11
         </Typography>
       </Box>
     </Box>

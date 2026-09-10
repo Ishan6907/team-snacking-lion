@@ -30,6 +30,7 @@ import SpaceGalaxyOrbitalEngine from '@/components/gis/SpaceGalaxyOrbitalEngine'
 import LegalChecklist from '@/components/gis/LegalChecklist';
 import TitleTimeline from '@/components/gis/TitleTimeline';
 import ValuationSimulator from '@/components/gis/ValuationSimulator';
+import RfctlarrTracker from '@/components/land/RfctlarrTracker';
 import { ALL_1428_PROJECTS } from '@/data/inventoryData';
 import { getProjectCadastralLayout } from '@/utils/geodetic';
 
@@ -433,6 +434,7 @@ export default function LandVerificationPage() {
               <Tab icon={<TimelineIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Provenance" />
               <Tab icon={<AccountBalance sx={{ fontSize: 16 }} />} iconPosition="start" label="CALA Valuation" />
               <Tab icon={<Sensors sx={{ fontSize: 16 }} />} iconPosition="start" label="Orbital Sensors" />
+              <Tab icon={<Description sx={{ fontSize: 16 }} />} iconPosition="start" label="RFCTLARR Tracker" />
             </Tabs>
 
             {/* TAB 0: Statutory Clearances Checklist */}
@@ -502,6 +504,13 @@ export default function LandVerificationPage() {
                     </Stack>
                   </Box>
                 </Stack>
+              </Box>
+            )}
+
+            {/* TAB 4: RFCTLARR Tracker */}
+            {activeTab === 4 && (
+              <Box sx={{ color: '#0f172a' }}>
+                <RfctlarrTracker projectId={activeProject.id} projectName={activeProject.name} state={activeProject.state} />
               </Box>
             )}
           </Paper>

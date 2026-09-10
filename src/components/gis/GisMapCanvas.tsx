@@ -250,6 +250,36 @@ export default function GisMapCanvas({ parcels, selectedParcel, onSelectParcel, 
         </Stack>
       </Box>
 
+      {/* === GIS DATA TRANSPARENCY NOTICE === */}
+      <Paper
+        elevation={0}
+        sx={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          zIndex: 20,
+          p: 1,
+          maxWidth: 320,
+          bgcolor: 'rgba(15, 23, 42, 0.88)',
+          backdropFilter: 'blur(4px)',
+          border: '1px solid rgba(100, 116, 139, 0.3)',
+          borderRadius: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.3, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+          ⚠ Data Source Transparency
+        </Typography>
+        <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.58rem', lineHeight: 1.3, display: 'block' }}>
+          <strong>Map Layer:</strong> Simulated cadastral visualization using deterministic geodetic projections. Not a live satellite feed.
+          <br />
+          <strong>Sensor Bands:</strong> Optical/SAR/NDVI/LiDAR modes render synthetic representations for demonstration purposes.
+          <br />
+          <strong>Coordinates:</strong> WGS84 projections are computed from state centroids and chainage offsets.
+          <br />
+          <strong>Upgrade Path:</strong> Replace with Bhuvan WMS/WMTS tiles, Sentinel Hub API, or Google Earth Engine for production-grade live imagery.
+        </Typography>
+      </Paper>
+
       {/* Cadastral Target Telemetry HUD Box */}
       <Paper
         elevation={0}

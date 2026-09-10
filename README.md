@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SIH%202026-Problem%20ID%3A%20SIH26103-blue?style=for-the-badge&logo=gov.in" alt="SIH Problem ID SIH26103" />
+  <img src="https://img.shields.io/badge/SIH%202026-Problem%20Statement%2011-blue?style=for-the-badge&logo=gov.in" alt="Problem Statement 11" />
   <img src="https://img.shields.io/badge/MoRD%20Expansion-Problem%20ID%3A%2025017-emerald?style=for-the-badge" alt="MoRD Problem ID 25017" />
   <img src="https://img.shields.io/badge/Accuracy-91.8%25%20Verified-brightgreen?style=for-the-badge" alt="Accuracy" />
   <img src="https://img.shields.io/badge/Severe%20Recall-92.3%25-orange?style=for-the-badge" alt="Severe Recall" />
@@ -36,7 +36,7 @@ Furthermore, PAIMANA natively integrates the **Ministry of Rural Development (Mo
 
 | Code | Ministry / Agency | Official Problem Statement Title |
 | :--- | :--- | :--- |
-| **SIH26103** | **MoSPI / MoRTH / PM GatiShakti** | *AI-powered Predictive Analytics and Early Warning System For Infrastructure Projects* |
+| **Problem Statement 11** | **MoSPI / MoRTH / PM GatiShakti** | *Explainable AI techniques to ensure transparency in prediction results* |
 | **SIH25017** | **MoRD / Dept of Land Resources** | *Predictive Analytics System for Early Detection of Land Acquisition Delays* |
 | **SIH26015** | **MoRD / Watershed Dev** | *Geospatial Techniques for Visualization & Analysis to Interpret Geo-Coded Images (SRISHTI-DRISHTI)* |
 | **SIH26016** | **MoRD / Land Administration** | *Real-Time National Land Acquisition & Management System for End-to-End Digital Monitoring* |
@@ -263,12 +263,18 @@ All core competition pitch decks and dossiers are maintained in the [`docs/`](./
 
 ---
 
+## 📊 Synthetic Demo Dataset
+A synthetic dataset of 300 records (`ml/synthetic_300_demo.csv`) is provided for demo and testing purposes. These records are **clearly labeled as synthetic** and should never be confused with real MoSPI/OCMS production data. The dataset matches the training schema and covers all 36 Indian States/UTs across 6 infrastructure sectors.
+
+---
+
 ## 👥 Team Details & Hackathon Submission
 
-- **Team Name:** Snacking Lion / Team BHOOMI-AI
+- **Team Name:** <INSERT TEAM NAME>
 - **Hackathon:** Smart India Hackathon (SIH 2026)
-- **Primary Problem Statement:** SIH26103 — AI-powered Predictive Analytics and Early Warning System For Infrastructure Projects
-- **Secondary Ministry Alignment:** SIH25017 — Predictive Analytics System for Early Detection of Land Acquisition Delays (MoRD / DoLR)
+- **Primary Problem Statement:** Problem Statement 11 — Explainable AI techniques to ensure transparency in prediction results
+  - Interactive dashboards displaying: Delay probability, Risk categorization, District-wise and State-wise delay trends, Timeline analysis, Performance indicators, Comparative analytics
+  - GIS-enabled visualization of high-risk projects on digital maps.
 - **License:** MIT Open Source License
 
 ---
