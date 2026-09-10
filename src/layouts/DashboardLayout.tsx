@@ -37,6 +37,7 @@ import {
   Gavel,
   CheckCircle,
   Science,
+  AccountBalance,
 } from '@mui/icons-material';
 import { useAuth } from '@/context/AuthContext';
 import PaimanaLogo from '@/components/common/PaimanaLogo';
@@ -256,6 +257,35 @@ export default function DashboardLayout() {
                 fontWeight: 800,
                 bgcolor: location.pathname === '/clearances/forest' ? 'rgba(255,255,255,0.2)' : '#fef2f2',
                 color: location.pathname === '/clearances/forest' ? '#ffffff' : '#b91c1c',
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding sx={{ mb: 0.4 }}>
+          <ListItemButton
+            selected={location.pathname === '/land-hub'}
+            onClick={() => navigate('/land-hub')}
+            sx={{
+              borderRadius: 1,
+              py: 0.7,
+              px: 1.2,
+              '&.Mui-selected': { bgcolor: '#c2410c', color: '#ffffff', '& .MuiListItemIcon-root': { color: '#ffffff' } },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 28, color: location.pathname === '/land-hub' ? '#ffffff' : '#c2410c' }}>
+              <AccountBalance sx={{ fontSize: 17 }} />
+            </ListItemIcon>
+            <ListItemText primary="Land & R&R Hub (25017)" primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 700 }} />
+            <Chip
+              label="SIH25017"
+              size="small"
+              sx={{
+                height: 18,
+                fontSize: '0.58rem',
+                fontWeight: 800,
+                bgcolor: location.pathname === '/land-hub' ? 'rgba(255,255,255,0.2)' : '#ffedd5',
+                color: location.pathname === '/land-hub' ? '#ffffff' : '#c2410c',
               }}
             />
           </ListItemButton>

@@ -62,7 +62,18 @@ declare module 'react-simple-maps' {
     };
   }
 
+  interface MarkerProps {
+    coordinates: [number, number];
+    children?: ReactNode;
+    style?: {
+      default?: CSSProperties;
+      hover?: CSSProperties;
+      pressed?: CSSProperties;
+    };
+  }
+
   export const ComposableMap: ComponentType<ComposableMapProps>;
   export const Geographies: ComponentType<GeographiesProps>;
   export const Geography: ComponentType<GeographyProps>;
+  export const Marker: ComponentType<MarkerProps>;
 }

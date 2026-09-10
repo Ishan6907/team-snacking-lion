@@ -243,6 +243,54 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
+      {/* SIH25017 Land Acquisition Delay Prediction Focus Strip */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: 1,
+          border: '1px solid #fed7aa',
+          bgcolor: '#fff7ed',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1.5,
+        }}
+      >
+        <Box>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.3 }}>
+            <Chip
+              label="SIH25017"
+              size="small"
+              sx={{ bgcolor: '#c2410c', color: '#ffffff', fontWeight: 800, fontSize: '0.62rem', height: 18 }}
+            />
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#c2410c', fontSize: '0.86rem' }}>
+              Special Focus: Early Detection &amp; Governance of Land Acquisition Delays
+            </Typography>
+          </Stack>
+          <Typography variant="caption" sx={{ color: '#9a3412', fontSize: '0.74rem' }}>
+            42 Stalled Corridors &bull; 18 Imminent Section 25 Statutory Lapses &bull; ₹51,800 Cr District Escrow Locked &bull; 1,24,500 Project Affected Families (PAFs)
+          </Typography>
+        </Box>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => navigate('/land-hub')}
+          sx={{
+            bgcolor: '#c2410c',
+            color: '#ffffff',
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            textTransform: 'none',
+            '&:hover': { bgcolor: '#9a3412' },
+          }}
+        >
+          Open Land &amp; R&amp;R Hub &rarr;
+        </Button>
+      </Paper>
+
       {/* Main Grid: S-Curve & Early Warnings */}
       <Grid container spacing={2}>
         {/* Left 8 Columns: CapEx S-Curve & Sector Vulnerability Matrix */}

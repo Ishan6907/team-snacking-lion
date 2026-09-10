@@ -17,6 +17,7 @@ import ForestClearancePage from '@/pages/ForestClearancePage';
 import ArbitrationClaimsPage from '@/pages/ArbitrationClaimsPage';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import HowItWorksPage from '@/pages/HowItWorksPage';
+import LandAcquisitionHubPage from '@/pages/LandAcquisitionHubPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="alerts" element={<AlertsPage />} />
         <Route path="upload" element={<UploadPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="land-hub" element={<LandAcquisitionHubPage />} />
         <Route path="verification" element={<LandVerificationPage />} />
         <Route path="land-gis" element={<LandVerificationPage />} />
         <Route path="clearances/forest" element={<ForestClearancePage />} />

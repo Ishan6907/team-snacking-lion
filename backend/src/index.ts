@@ -33,6 +33,8 @@ app.use('/api/v1/auth', authRoutes);
 
 import districtRoutes from './routes/districts';
 
+import landAcquisitionRoutes from './routes/landAcquisition';
+
 // Authenticated routes — require any valid role
 const requireAuth = requireRole('admin', 'analyst', 'viewer');
 app.use('/api/v1/projects', requireAuth, projectRoutes);
@@ -41,6 +43,7 @@ app.use('/api/v1/sectors', requireAuth, sectorRoutes);
 app.use('/api/v1/alerts', requireAuth, alertRoutes);
 app.use('/api/v1/recommendations', requireAuth, recommendationRoutes);
 app.use('/api/v1/districts', requireAuth, districtRoutes);
+app.use('/api/v1/land-acquisition', requireAuth, landAcquisitionRoutes);
 
 // Analyst/Admin routes — require elevated permissions
 const requireAnalyst = requireRole('admin', 'analyst');

@@ -44,7 +44,7 @@ export default function MasterInventoryPage() {
   }, [thresholds]);
 
   const [selectedIds, setSelectedIds] = useState<string[]>(['NHAI-DEL-MUM-P4']);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'critical' | 'moderate' | 'nominal' | 'blocked'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'critical' | 'moderate' | 'nominal' | 'blocked' | 'sec25' | 'compensation'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sectorSelect, setSectorSelect] = useState('all');
   const [stateSelect, setStateSelect] = useState('all');
@@ -106,6 +106,12 @@ export default function MasterInventoryPage() {
       if (statusFilter === 'moderate' && (p.predictedDelayDays < thresholds.warningDelay || p.predictedDelayDays >= thresholds.criticalDelay)) return false;
       if (statusFilter === 'nominal' && p.predictedDelayDays >= thresholds.warningDelay) return false;
       if (statusFilter === 'blocked' && !p.criticalBlocker.toLowerCase().includes('land') && !p.criticalBlocker.toLowerCase().includes('clearance') && !p.criticalBlocker.toLowerCase().includes('moefcc')) {
+        return false;
+      }
+      if (statusFilter === 'sec25' && p.predictedDelayDays < 300) {
+        return false;
+      }
+      if (statusFilter === 'compensation' && !p.criticalBlocker.toLowerCase().includes('compensation') && !p.criticalBlocker.toLowerCase().includes('award') && !p.criticalBlocker.toLowerCase().includes('3g') && !p.criticalBlocker.toLowerCase().includes('3h') && !p.criticalBlocker.toLowerCase().includes('escrow')) {
         return false;
       }
 
@@ -225,7 +231,7 @@ export default function MasterInventoryPage() {
   };
 
   // Reset to page 1 on filter changes
-  const handleStatusFilterChange = (filter: 'all' | 'critical' | 'moderate' | 'nominal' | 'blocked') => {
+  const handleStatusFilterChange = (filter: 'all' | 'critical' | 'moderate' | 'nominal' | 'blocked' | 'sec25' | 'compensation') => {
     setStatusFilter(filter);
     setPage(1);
   };
@@ -448,6 +454,34 @@ export default function MasterInventoryPage() {
             bgcolor: statusFilter === 'blocked' ? '#c2410c' : '#ffffff',
             color: statusFilter === 'blocked' ? '#ffffff' : '#c2410c',
             border: statusFilter === 'blocked' ? 'none' : '1px solid #fed7aa',
+          }}
+        />
+        <Chip
+          label="● Section 25 Lapsing Risk (>300d)"
+          size="small"
+          onClick={() => handleStatusFilterChange('sec25')}
+          sx={{
+            cursor: 'pointer',
+            height: 24,
+            fontSize: '0.68rem',
+            fontWeight: 800,
+            bgcolor: statusFilter === 'sec25' ? '#991b1b' : '#ffffff',
+            color: statusFilter === 'sec25' ? '#ffffff' : '#991b1b',
+            border: statusFilter === 'sec25' ? 'none' : '1px solid #fca5a5',
+          }}
+        />
+        <Chip
+          label="● Compensation / Escrow Disputes"
+          size="small"
+          onClick={() => handleStatusFilterChange('compensation')}
+          sx={{
+            cursor: 'pointer',
+            height: 24,
+            fontSize: '0.68rem',
+            fontWeight: 800,
+            bgcolor: statusFilter === 'compensation' ? '#b45309' : '#ffffff',
+            color: statusFilter === 'compensation' ? '#ffffff' : '#b45309',
+            border: statusFilter === 'compensation' ? 'none' : '1px solid #fcd34d',
           }}
         />
       </Stack>
