@@ -272,9 +272,9 @@ A synthetic dataset of 300 records (`ml/synthetic_300_demo.csv`) is provided for
 
 - **Team Name:** <INSERT TEAM NAME>
 - **Hackathon:** Smart India Hackathon (SIH 2026)
-- **Primary Problem Statement:** Problem Statement 11 — Explainable AI techniques to ensure transparency in prediction results
-  - Interactive dashboards displaying: Delay probability, Risk categorization, District-wise and State-wise delay trends, Timeline analysis, Performance indicators, Comparative analytics
-  - GIS-enabled visualization of high-risk projects on digital maps.
+- **Primary Problem Statement:** Problem Statement 11: Explainable AI techniques to ensure transparency in prediction results.
+  • Interactive dashboards displaying: Delay probability, Risk categorization, District-wise and State-wise delay trends, Timeline analysis, Performance indicators, Comparative analytics
+  • GIS-enabled visualization of high-risk projects on digital maps.
 - **License:** MIT Open Source License
 
 ---

@@ -117,6 +117,13 @@ export default function IndiaHeatmap({ data }: IndiaHeatmapProps) {
           </Box>
         </MuiTooltip>
       </CardContent>
+
+      {/* GIS Data Transparency Notice */}
+      <Box sx={{ px: 2.5, pb: 2, pt: 0, borderTop: '1px solid #f1f5f9' }}>
+        <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.64rem', display: 'block', lineHeight: 1.3, mt: 1 }}>
+          <strong>Geographic Granularity &amp; Transparency:</strong> Boundaries represent Survey of India / TopoJSON state administrative divisions. Color gradients reflect mean predicted delay days from the ML model. Production upgrade path: Integrate ISRO Bhuvan WMS district tiles or Sentinel Hub API for sub-district resolution.
+        </Typography>
+      </Box>
     </Card>
   );
 }

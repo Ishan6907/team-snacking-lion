@@ -356,10 +356,10 @@ export default function DashboardLayout() {
           <CheckCircle sx={{ fontSize: 16, color: '#15803d' }} />
           <Box>
             <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.72rem', display: 'block' }}>
-              Problem Statement 11 &bull; SIH 2026
+              Problem Statement 11 &bull; &lt;INSERT TEAM NAME&gt;
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem' }}>
-              Explainable AI &bull; NIC BharatNet
+              Explainable AI &bull; Dashboards &bull; GIS Maps
             </Typography>
           </Box>
         </Stack>

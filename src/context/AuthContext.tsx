@@ -78,19 +78,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginWithGoogle = useCallback(async () => {
-    const googleUser: User = {
-      id: 'google-analyst-1',
-      email: 'officer@gov.in',
-      name: 'Government Project Officer',
-      role: 'admin',
-      agency: 'MoSPI / PMO Infrastructure Taskforce',
-      department: 'Central Project Monitoring',
-    };
-    const token = 'google-oauth2-verified-token';
-    localStorage.setItem('paimana_token', token);
-    localStorage.setItem('paimana_user', JSON.stringify(googleUser));
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setState({ user: googleUser, accessToken: token, isAuthenticated: true, isLoading: false });
+    try {
+      const { data } = await apiClient.post<{ user: User; accessToken: string }>('/auth/google', {
+        email: 'officer@gov.in',
+        name: 'Government Project Officer',
+      });
+      localStorage.setItem('paimana_token', data.accessToken);
+      localStorage.setItem('paimana_user', JSON.stringify(data.user));
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+      setState({ user: data.user, accessToken: data.accessToken, isAuthenticated: true, isLoading: false });
+    } catch {
+      const googleUser: User = {
+        id: 'google-analyst-1',
+        email: 'officer@gov.in',
+        name: 'Government Project Officer',
+        role: 'admin',
+        agency: 'MoSPI / PMO Infrastructure Taskforce',
+        department: 'Central Project Monitoring',
+      };
+      const token = 'google-oauth2-verified-token';
+      localStorage.setItem('paimana_token', token);
+      localStorage.setItem('paimana_user', JSON.stringify(googleUser));
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setState({ user: googleUser, accessToken: token, isAuthenticated: true, isLoading: false });
+    }
   }, []);
 
   const changePassword = useCallback(async (oldPassword: string, newPassword: string) => {

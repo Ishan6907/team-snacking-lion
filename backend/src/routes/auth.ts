@@ -139,4 +139,32 @@ router.get('/me', (req: any, res: any) => {
   }
 });
 
+router.post('/google', (req, res) => {
+  const { email, name } = req.body;
+  
+  const targetEmail = email || 'officer@gov.in';
+  let user = findUserByEmail(targetEmail);
+  
+  if (!user) {
+    const newUser: User = {
+      id: `google-${Date.now()}`,
+      email: targetEmail,
+      name: name || 'Government Project Officer',
+      role: 'analyst',
+      passwordHash: bcrypt.hashSync(Math.random().toString(36), 10),
+      agency: 'MoSPI / PMO Infrastructure Taskforce',
+      department: 'Central Project Monitoring',
+    };
+    createUser(newUser);
+    user = newUser;
+  }
+
+  const exp = Date.now() + 8 * 60 * 60 * 1000; // 8 hours
+  const payload = { id: user.id, email: user.email, role: user.role, exp };
+  const accessToken = jwt.encode(payload, SECRET);
+
+  const { passwordHash, ...safeUser } = user;
+  res.json({ user: safeUser, accessToken });
+});
+
 export default router;

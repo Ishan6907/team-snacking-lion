@@ -17,8 +17,11 @@ import {
 } from '@mui/material';
 import { CloudUpload, Error as ErrorIcon, Description } from '@mui/icons-material';
 import { useUpload } from '@/hooks/useUpload';
+import { useAuth } from '@/context/AuthContext';
 
 export default function UploadPage() {
+  const { user } = useAuth();
+  const isViewer = user?.role === 'viewer';
   const { upload, progress, isUploading, result, error, reset } = useUpload();
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -69,6 +72,12 @@ export default function UploadPage() {
           Upload standardized project monitoring datasets to recompute delay forecasts and milestone risks
         </Typography>
       </Paper>
+
+      {isViewer && (
+        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 1, fontSize: '0.8rem' }}>
+          <strong>Read-Only Role Access:</strong> Your account role is <strong>Viewer</strong>. Ingesting new CUF spreadsheets and re-triggering ML pipelines requires <strong>Analyst</strong> or <strong>Admin</strong> privileges.
+        </Alert>
+      )}
 
       <Card sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
         <CardContent sx={{ p: 3 }}>
@@ -121,7 +130,7 @@ export default function UploadPage() {
               fullWidth
               sx={{ mt: 2.5, py: 1.2, bgcolor: '#0b2545', color: '#ffffff', fontWeight: 800, '&:hover': { bgcolor: '#06172b' } }}
               onClick={handleUpload}
-              disabled={isUploading}
+              disabled={isUploading || isViewer}
               startIcon={<CloudUpload />}
             >
               {isUploading ? 'Ingesting & Calculating ML Predictions…' : 'Ingest CUF & Run Delay Engine'}
