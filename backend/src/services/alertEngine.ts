@@ -44,7 +44,7 @@ export function generateAlerts(): { generated: number; alerts: any[] } {
             projectId: project.id,
             projectName: project.name,
             sector: project.sector,
-            severity: 'high' as const,
+            severity: 'warning' as const,
             category: 'land_acquisition',
             title: 'Critical Land Acquisition Blocker',
             message: `Project has a critical land acquisition blocker: ${project.primaryBottleneck}`,
