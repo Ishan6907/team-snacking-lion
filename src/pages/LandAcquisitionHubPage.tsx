@@ -20,9 +20,11 @@ import {
   InputAdornment,
   Alert,
   Tooltip,
-  IconButton,
   Card,
-  CardContent,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import {
   AccountBalance,
@@ -31,22 +33,21 @@ import {
   Search,
   CheckCircle,
   WarningAmber,
-  ErrorOutline,
   Layers,
   History,
-  TrendingUp,
-  FileDownload,
   Launch,
   Security,
   Refresh,
   People,
   HomeWork,
+  PinDrop,
+  FolderOpen,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { landAcquisitionApi, type LandAcquisitionKPIs, type LandProjectItem, type AuditEventItem } from '@/api/landAcquisition';
 
-const INDIA_TOPO_URL = 'https://cdn.jsdelivr.net/npm/india-topojson@1.0.0/india.json';
+const INDIA_GEO_URL = '/india.json';
 
 const STAGE_COLORS: Record<number, string> = {
   0: '#64748b', // Section 4 - Gray
@@ -66,6 +67,7 @@ export default function LandAcquisitionHubPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStateFilter, setSelectedStateFilter] = useState('ALL');
+  const [selectedRiskFilter, setSelectedRiskFilter] = useState('ALL');
   const [selectedProject, setSelectedProject] = useState<LandProjectItem | null>(null);
 
   const loadData = async () => {
@@ -101,9 +103,10 @@ export default function LandAcquisitionHubPage() {
         p.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.state.toLowerCase().includes(searchQuery.toLowerCase());
       const matchState = selectedStateFilter === 'ALL' || p.state === selectedStateFilter;
-      return matchSearch && matchState;
+      const matchRisk = selectedRiskFilter === 'ALL' || p.riskLevel === selectedRiskFilter;
+      return matchSearch && matchState && matchRisk;
     });
-  }, [projects, searchQuery, selectedStateFilter]);
+  }, [projects, searchQuery, selectedStateFilter, selectedRiskFilter]);
 
   const uniqueStates = useMemo(() => {
     return Array.from(new Set(projects.map((p) => p.state))).sort();
@@ -187,23 +190,23 @@ export default function LandAcquisitionHubPage() {
       {/* Top 4 KPI Metrics */}
       <Grid container spacing={2} sx={{ mb: 2.5 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 1.5, bgcolor: '#ffffff' }}>
+          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 2, bgcolor: '#ffffff' }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: 0.5 }}>
                 Total Land Outlay
               </Typography>
-              <AccountBalance sx={{ color: '#0284c7', fontSize: 18 }} />
+              <AccountBalance sx={{ color: '#0284c7', fontSize: 20 }} />
             </Stack>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', mt: 0.5, fontFamily: 'monospace' }}>
               ₹{(kpis?.totalOutlayCr || 148200).toLocaleString()} Cr
             </Typography>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.8 }}>
               <LinearProgress
                 variant="determinate"
                 value={kpis?.disbursedPct || 65.1}
                 sx={{ flex: 1, height: 6, borderRadius: 1, bgcolor: '#e2e8f0', '& .MuiLinearProgress-bar': { bgcolor: '#0284c7' } }}
               />
-              <Typography variant="caption" sx={{ color: '#0284c7', fontWeight: 800, fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ color: '#0284c7', fontWeight: 800, fontSize: '0.72rem' }}>
                 {kpis?.disbursedPct || 65.1}% Disbursed
               </Typography>
             </Stack>
@@ -211,40 +214,40 @@ export default function LandAcquisitionHubPage() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 1.5, bgcolor: '#ffffff' }}>
+          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 2, bgcolor: '#ffffff' }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: 0.5 }}>
                 District Escrow Locked
               </Typography>
-              <Gavel sx={{ color: '#d97706', fontSize: 18 }} />
+              <Gavel sx={{ color: '#d97706', fontSize: 20 }} />
             </Stack>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#d97706', mt: 0.5, fontFamily: 'monospace' }}>
               ₹{(kpis?.totalEscrowBalanceCr || 51800).toLocaleString()} Cr
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem', display: 'block', mt: 0.5 }}>
+            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem', display: 'block', mt: 0.8 }}>
               Awaiting CALA Section 3H(1) award release
             </Typography>
           </Card>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 1.5, bgcolor: '#ffffff' }}>
+          <Card elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 1, p: 2, bgcolor: '#ffffff' }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>
-                Project Affected Families (PAFs)
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: 0.5 }}>
+                Project Affected Families
               </Typography>
-              <People sx={{ color: '#16a34a', fontSize: 18 }} />
+              <People sx={{ color: '#16a34a', fontSize: 20 }} />
             </Stack>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', mt: 0.5, fontFamily: 'monospace' }}>
               {(kpis?.totalAffectedFamilies || 124500).toLocaleString()}
             </Typography>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.8 }}>
               <LinearProgress
                 variant="determinate"
                 value={kpis?.relocationPct || 67.6}
                 sx={{ flex: 1, height: 6, borderRadius: 1, bgcolor: '#e2e8f0', '& .MuiLinearProgress-bar': { bgcolor: '#16a34a' } }}
               />
-              <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 800, fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 800, fontSize: '0.72rem' }}>
                 {kpis?.relocationPct || 67.6}% Relocated
               </Typography>
             </Stack>
@@ -252,18 +255,18 @@ export default function LandAcquisitionHubPage() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #fed7aa', borderRadius: 1, p: 1.5, bgcolor: '#fff7ed' }}>
+          <Card elevation={0} sx={{ border: '1px solid #fed7aa', borderRadius: 1, p: 2, bgcolor: '#fff7ed' }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.68rem' }}>
-                Sec 25 Statutory Lapsing Risks
+              <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: 0.5 }}>
+                Sec 25 Statutory Lapses
               </Typography>
-              <WarningAmber sx={{ color: '#ea580c', fontSize: 18 }} />
+              <WarningAmber sx={{ color: '#ea580c', fontSize: 20 }} />
             </Stack>
             <Typography variant="h5" sx={{ fontWeight: 900, color: '#c2410c', mt: 0.5, fontFamily: 'monospace' }}>
               {kpis?.section25LapseRisksCount || 18} Corridors
             </Typography>
-            <Typography variant="caption" sx={{ color: '#9a3412', fontSize: '0.7rem', display: 'block', mt: 0.5, fontWeight: 600 }}>
-              &lt; 90 days remaining on 12-month statutory clock
+            <Typography variant="caption" sx={{ color: '#9a3412', fontSize: '0.72rem', display: 'block', mt: 0.8, fontWeight: 700 }}>
+              &lt; 90 days on 12-month statutory clock
             </Typography>
           </Card>
         </Grid>
@@ -293,7 +296,70 @@ export default function LandAcquisitionHubPage() {
         {/* TAB 0: PORTFOLIO GIS RISK MAP */}
         {activeTab === 0 && (
           <Box sx={{ p: 2.5 }}>
+            {/* Filter Ribbon */}
+            <Paper elevation={0} sx={{ p: 1.5, mb: 2, border: '1px solid #e2e8f0', borderRadius: 1, bgcolor: '#f8fafc' }}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" justifyContent="space-between">
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }}>
+                  <TextField
+                    size="small"
+                    placeholder="Search corridor or district..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    sx={{ width: { xs: '100%', sm: 240 }, bgcolor: '#ffffff' }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search sx={{ color: '#94a3b8', fontSize: 18 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <FormControl size="small" sx={{ minWidth: 160, bgcolor: '#ffffff' }}>
+                    <InputLabel sx={{ fontSize: '0.78rem' }}>Filter by State</InputLabel>
+                    <Select
+                      value={selectedStateFilter}
+                      label="Filter by State"
+                      onChange={(e) => setSelectedStateFilter(e.target.value)}
+                      sx={{ fontSize: '0.78rem' }}
+                    >
+                      <MenuItem value="ALL" sx={{ fontSize: '0.78rem' }}>All States / UTs ({projects.length})</MenuItem>
+                      {uniqueStates.map((st) => (
+                        <MenuItem key={st} value={st} sx={{ fontSize: '0.78rem' }}>
+                          {st}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl size="small" sx={{ minWidth: 140, bgcolor: '#ffffff' }}>
+                    <InputLabel sx={{ fontSize: '0.78rem' }}>Risk Severity</InputLabel>
+                    <Select
+                      value={selectedRiskFilter}
+                      label="Risk Severity"
+                      onChange={(e) => setSelectedRiskFilter(e.target.value)}
+                      sx={{ fontSize: '0.78rem' }}
+                    >
+                      <MenuItem value="ALL" sx={{ fontSize: '0.78rem' }}>All Risks</MenuItem>
+                      <MenuItem value="critical" sx={{ fontSize: '0.78rem', color: '#b91c1c', fontWeight: 700 }}>Critical (&gt;180d)</MenuItem>
+                      <MenuItem value="high" sx={{ fontSize: '0.78rem', color: '#ea580c', fontWeight: 700 }}>High (&gt;60d)</MenuItem>
+                      <MenuItem value="medium" sx={{ fontSize: '0.78rem', color: '#d97706' }}>Moderate</MenuItem>
+                      <MenuItem value="low" sx={{ fontSize: '0.78rem', color: '#15803d' }}>On-Track</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Stack>
+
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Chip label="Critical (>180d)" size="small" sx={{ bgcolor: '#fee2e2', color: '#dc2626', fontWeight: 800, fontSize: '0.65rem' }} />
+                  <Chip label="High (60-180d)" size="small" sx={{ bgcolor: '#ffedd5', color: '#ea580c', fontWeight: 800, fontSize: '0.65rem' }} />
+                  <Chip label="Moderate (30-60d)" size="small" sx={{ bgcolor: '#fef3c7', color: '#d97706', fontWeight: 800, fontSize: '0.65rem' }} />
+                  <Chip label="On-Track (<30d)" size="small" sx={{ bgcolor: '#dcfce7', color: '#16a34a', fontWeight: 800, fontSize: '0.65rem' }} />
+                </Stack>
+              </Stack>
+            </Paper>
+
             <Grid container spacing={2}>
+              {/* Map Canvas */}
               <Grid item xs={12} lg={8}>
                 <Paper
                   elevation={0}
@@ -301,49 +367,50 @@ export default function LandAcquisitionHubPage() {
                     p: 2,
                     borderRadius: 1,
                     border: '1px solid #e2e8f0',
-                    bgcolor: '#0f172a',
-                    color: '#ffffff',
+                    bgcolor: '#ffffff',
                     position: 'relative',
-                    height: 520,
+                    height: 560,
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1, zIndex: 10, position: 'relative' }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', fontSize: '0.85rem' }}>
-                        All-India Land Acquisition Geodetic Risk Heatmap
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.88rem' }}>
+                        All-India Infrastructure Corridor Land Acquisition Heatmap
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.72rem' }}>
-                        Click on any corridor node to inspect district revenue encumbrance &amp; CALA delay telemetry
+                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem' }}>
+                        Showing {filteredProjects.length} geolocated corridors &bull; Click any pin to open corridor dossier
                       </Typography>
                     </Box>
-                    <Stack direction="row" spacing={1}>
-                      <Chip label="Critical (Delay > 180d)" size="small" sx={{ bgcolor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', height: 20, fontSize: '0.62rem', fontWeight: 800 }} />
-                      <Chip label="Section 25 At-Risk" size="small" sx={{ bgcolor: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', height: 20, fontSize: '0.62rem', fontWeight: 800 }} />
-                      <Chip label="On-Track" size="small" sx={{ bgcolor: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', height: 20, fontSize: '0.62rem', fontWeight: 800 }} />
-                    </Stack>
+                    <Typography variant="caption" sx={{ color: '#0284c7', fontWeight: 700, fontSize: '0.72rem' }}>
+                      Survey of India Cadastral Projection
+                    </Typography>
                   </Stack>
 
-                  <Box sx={{ width: '100%', height: 440, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <Box sx={{ width: '100%', flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #f1f5f9' }}>
                     <ComposableMap
                       projection="geoMercator"
                       projectionConfig={{
-                        scale: 820,
-                        center: [82.5, 22.5],
+                        scale: 960,
+                        center: [82.5, 22.0],
                       }}
+                      width={540}
+                      height={490}
                       style={{ width: '100%', height: '100%' }}
                     >
-                      <Geographies geography={INDIA_TOPO_URL}>
+                      <Geographies geography={INDIA_GEO_URL}>
                         {({ geographies }) =>
                           geographies.map((geo) => (
                             <Geography
                               key={geo.rsmKey}
                               geography={geo}
-                              fill="#1e293b"
-                              stroke="#334155"
-                              strokeWidth={0.6}
+                              fill="#f1f5f9"
+                              stroke="#cbd5e1"
+                              strokeWidth={0.8}
                               style={{
                                 default: { outline: 'none' },
-                                hover: { fill: '#334155', outline: 'none' },
+                                hover: { fill: '#fed7aa', outline: 'none', cursor: 'pointer' },
                                 pressed: { outline: 'none' },
                               }}
                             />
@@ -354,19 +421,38 @@ export default function LandAcquisitionHubPage() {
                       {filteredProjects.map((p) => {
                         const isSelected = selectedProject?.id === p.id;
                         const markerColor =
-                          p.predictedDelayDays > 180 ? '#ef4444' : p.predictedDelayDays > 60 ? '#f59e0b' : '#22c55e';
+                          p.predictedDelayDays > 180 ? '#dc2626' : p.predictedDelayDays > 60 ? '#ea580c' : p.predictedDelayDays > 30 ? '#d97706' : '#16a34a';
 
                         return (
                           <Marker key={p.id} coordinates={[p.lon, p.lat]}>
-                            <Tooltip title={`${p.name} (${p.district}, ${p.state}) — Delay: +${p.predictedDelayDays}d`} arrow>
-                              <circle
-                                r={isSelected ? 7 : p.predictedDelayDays > 180 ? 5 : 3.5}
-                                fill={markerColor}
-                                stroke={isSelected ? '#ffffff' : '#0f172a'}
-                                strokeWidth={isSelected ? 2 : 1}
-                                style={{ cursor: 'pointer', opacity: isSelected ? 1 : 0.85 }}
-                                onClick={() => setSelectedProject(p)}
-                              />
+                            <Tooltip
+                              title={
+                                <Box sx={{ p: 0.5 }}>
+                                  <Typography variant="caption" sx={{ fontWeight: 800, display: 'block' }}>
+                                    {p.name}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ display: 'block', fontSize: '0.7rem' }}>
+                                    {p.district}, {p.state} &bull; {p.rfctlarrStage.split('(')[0]}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: '#fca5a5', fontWeight: 800, fontSize: '0.7rem' }}>
+                                    Predicted Delay: +{p.predictedDelayDays} Days
+                                  </Typography>
+                                </Box>
+                              }
+                              arrow
+                            >
+                              <g style={{ cursor: 'pointer' }} onClick={() => setSelectedProject(p)}>
+                                {isSelected && (
+                                  <circle r={10} fill="none" stroke="#c2410c" strokeWidth={2} strokeDasharray="3 3" />
+                                )}
+                                <circle
+                                  r={isSelected ? 6.5 : p.predictedDelayDays > 180 ? 5 : 3.8}
+                                  fill={markerColor}
+                                  stroke="#ffffff"
+                                  strokeWidth={1.5}
+                                  style={{ transition: 'all 0.2s' }}
+                                />
+                              </g>
                             </Tooltip>
                           </Marker>
                         );
@@ -376,116 +462,183 @@ export default function LandAcquisitionHubPage() {
                 </Paper>
               </Grid>
 
-              {/* Side Corridor Inspector Drawer */}
+              {/* Corridor Dossier Side Panel */}
               <Grid item xs={12} lg={4}>
                 {selectedProject ? (
-                  <Paper elevation={0} sx={{ p: 2, borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#f8fafc', height: 520, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 1,
+                      border: '1px solid #e2e8f0',
+                      bgcolor: '#ffffff',
+                      height: 560,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                    }}
+                  >
                     <Box>
+                      {/* Top Code and Delay Chip */}
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1 }}>
                         <Box>
-                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, fontFamily: 'monospace', fontSize: '0.68rem' }}>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, fontFamily: 'monospace', fontSize: '0.7rem' }}>
                             {selectedProject.id}
                           </Typography>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0f172a', fontSize: '0.95rem', lineHeight: 1.2 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0f172a', fontSize: '1rem', lineHeight: 1.25, mt: 0.2 }}>
                             {selectedProject.name}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem' }}>
-                            {selectedProject.district}, {selectedProject.state} &bull; {selectedProject.sector}
-                          </Typography>
+                          <Stack direction="row" spacing={0.8} sx={{ mt: 0.5 }}>
+                            <Chip label={selectedProject.sector} size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700, bgcolor: '#f1f5f9' }} />
+                            <Chip label={`${selectedProject.district}, ${selectedProject.state}`} size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700, bgcolor: '#f1f5f9' }} />
+                          </Stack>
                         </Box>
                         <Chip
-                          label={`+${selectedProject.predictedDelayDays} Days`}
+                          label={`+${selectedProject.predictedDelayDays}d Delay`}
                           size="small"
                           sx={{
                             fontWeight: 800,
                             fontFamily: 'monospace',
-                            fontSize: '0.68rem',
-                            bgcolor: selectedProject.predictedDelayDays > 180 ? '#fef2f2' : '#fefce8',
-                            color: selectedProject.predictedDelayDays > 180 ? '#b91c1c' : '#a16207',
-                            border: `1px solid ${selectedProject.predictedDelayDays > 180 ? '#fecaca' : '#fef08a'}`,
+                            fontSize: '0.72rem',
+                            bgcolor: selectedProject.predictedDelayDays > 180 ? '#fee2e2' : '#ffedd5',
+                            color: selectedProject.predictedDelayDays > 180 ? '#b91c1c' : '#c2410c',
+                            border: `1px solid ${selectedProject.predictedDelayDays > 180 ? '#fca5a5' : '#fed7aa'}`,
                           }}
                         />
                       </Stack>
 
+                      {/* Section 25 Lapsing Warning Alert */}
                       {selectedProject.isLapseWarning && (
-                        <Alert severity="error" sx={{ py: 0.3, px: 1, mb: 1.5, fontSize: '0.7rem' }}>
-                          <strong>Section 25 Lapsing Risk:</strong> Only {selectedProject.statutoryLapseRemainingDays} days remaining before 12-month statutory gazette clock expires!
+                        <Alert severity="error" sx={{ py: 0.5, px: 1.2, my: 1.5, fontSize: '0.72rem', borderRadius: 1 }}>
+                          <strong>Section 25 Statutory Lapsing Alert:</strong> Only {selectedProject.statutoryLapseRemainingDays} days left on the 12-month gazette clock before proceedings lapse!
                         </Alert>
                       )}
 
-                      <Box sx={{ p: 1.5, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0', mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem' }}>
-                          RFCTLARR Statutory Stage
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: STAGE_COLORS[selectedProject.stageIndex] || '#0f172a', fontSize: '0.82rem' }}>
+                      {/* RFCTLARR Stage Block */}
+                      <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0', my: 1.5 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                            RFCTLARR Statutory Stage
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 600 }}>
+                            Stalled {selectedProject.daysInCurrentStage} days
+                          </Typography>
+                        </Stack>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: STAGE_COLORS[selectedProject.stageIndex] || '#0f172a', fontSize: '0.85rem', mt: 0.2 }}>
                           {selectedProject.rfctlarrStage}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem' }}>
-                          Stalled for {selectedProject.daysInCurrentStage} days at this stage
-                        </Typography>
+                        {/* 6 Stage Mini Stepper Progress */}
+                        <Stack direction="row" spacing={0.5} sx={{ mt: 1 }}>
+                          {[0, 1, 2, 3, 4, 5].map((step) => (
+                            <Box
+                              key={step}
+                              sx={{
+                                flex: 1,
+                                height: 5,
+                                borderRadius: 0.5,
+                                bgcolor: step <= selectedProject.stageIndex ? STAGE_COLORS[selectedProject.stageIndex] : '#e2e8f0',
+                              }}
+                            />
+                          ))}
+                        </Stack>
                       </Box>
 
+                      {/* 4 Financial & PAF Metrics */}
                       <Grid container spacing={1} sx={{ mb: 1.5 }}>
                         <Grid item xs={6}>
-                          <Box sx={{ p: 1, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                          <Box sx={{ p: 1.2, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
                             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', display: 'block' }}>
                               Land Outlay
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
-                              ₹{selectedProject.landOutlayCr} Cr
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                              ₹{selectedProject.landOutlayCr.toLocaleString()} Cr
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#15803d', fontSize: '0.62rem', fontWeight: 700 }}>
+                              {selectedProject.disbursedPct}% Disbursed
                             </Typography>
                           </Box>
                         </Grid>
                         <Grid item xs={6}>
-                          <Box sx={{ p: 1, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                          <Box sx={{ p: 1.2, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
                             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', display: 'block' }}>
-                              Escrow Locked
+                              District Escrow Locked
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', color: '#d97706' }}>
-                              ₹{selectedProject.escrowBalanceCr} Cr
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', fontSize: '0.85rem', color: '#d97706' }}>
+                              ₹{selectedProject.escrowBalanceCr.toLocaleString()} Cr
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#d97706', fontSize: '0.62rem', fontWeight: 700 }}>
+                              CALA Account
                             </Typography>
                           </Box>
                         </Grid>
                         <Grid item xs={6}>
-                          <Box sx={{ p: 1, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                          <Box sx={{ p: 1.2, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
                             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', display: 'block' }}>
-                              Affected Families
+                              Affected Families (PAFs)
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', fontSize: '0.85rem' }}>
                               {selectedProject.affectedFamilies} PAFs
                             </Typography>
+                            <Typography variant="caption" sx={{ color: '#16a34a', fontSize: '0.62rem', fontWeight: 700 }}>
+                              {selectedProject.familiesRelocated} Relocated
+                            </Typography>
                           </Box>
                         </Grid>
                         <Grid item xs={6}>
-                          <Box sx={{ p: 1, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                          <Box sx={{ p: 1.2, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
                             <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', display: 'block' }}>
                               Legal Disputes
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', color: selectedProject.legalDisputesCount > 0 ? '#b91c1c' : '#15803d' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', fontSize: '0.85rem', color: selectedProject.legalDisputesCount > 0 ? '#b91c1c' : '#15803d' }}>
                               {selectedProject.legalDisputesCount} Writs/Claims
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: selectedProject.legalDisputesCount > 0 ? '#b91c1c' : '#15803d', fontSize: '0.62rem', fontWeight: 700 }}>
+                              {selectedProject.legalDisputesCount > 0 ? 'High Court Stays' : 'Clear Title'}
                             </Typography>
                           </Box>
                         </Grid>
                       </Grid>
 
-                      <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.74rem', display: 'block' }}>
-                        <strong>Critical Blocker:</strong> {selectedProject.primaryBottleneck}
-                      </Typography>
+                      {/* Primary Bottleneck */}
+                      <Box sx={{ p: 1.2, bgcolor: '#fff7ed', borderRadius: 1, border: '1px solid #fed7aa', mb: 1.5 }}>
+                        <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 800, fontSize: '0.68rem', display: 'block' }}>
+                          PRIMARY BOTTLENECK
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#431407', fontSize: '0.74rem', display: 'block', mt: 0.2 }}>
+                          {selectedProject.primaryBottleneck}
+                        </Typography>
+                      </Box>
                     </Box>
 
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="small"
-                      startIcon={<Launch />}
-                      onClick={() => navigate(`/verification?id=${encodeURIComponent(selectedProject.id)}`)}
-                      sx={{ bgcolor: '#0b2545', color: '#ffffff', textTransform: 'none', fontSize: '0.74rem' }}
-                    >
-                      View Micro-Cadastral Parcels
-                    </Button>
+                    {/* Action Navigation */}
+                    <Stack spacing={1}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        size="small"
+                        startIcon={<Launch />}
+                        onClick={() => navigate(`/milestones/${encodeURIComponent(selectedProject.id)}`)}
+                        sx={{ bgcolor: '#0b2545', color: '#ffffff', textTransform: 'none', fontSize: '0.74rem', py: 0.8, '&:hover': { bgcolor: '#133a6f' } }}
+                      >
+                        Deep Milestone &amp; Corrective AI Actions &rarr;
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        startIcon={<PinDrop />}
+                        onClick={() => navigate(`/verification?id=${encodeURIComponent(selectedProject.id)}`)}
+                        sx={{ borderColor: '#c2410c', color: '#c2410c', textTransform: 'none', fontSize: '0.74rem', py: 0.8 }}
+                      >
+                        Inspect Micro-Cadastral Parcels
+                      </Button>
+                    </Stack>
                   </Paper>
                 ) : (
-                  <Box sx={{ p: 3, textAlign: 'center', color: '#94a3b8' }}>Select a corridor on the map</Box>
+                  <Box sx={{ p: 4, textAlign: 'center', color: '#94a3b8' }}>
+                    Click on any corridor marker on the map to inspect telemetry
+                  </Box>
                 )}
               </Grid>
             </Grid>
@@ -499,33 +652,32 @@ export default function LandAcquisitionHubPage() {
               RFCTLARR Act 2013 Statutory Pipeline &amp; Bottleneck Stage Dispersion
             </Typography>
             <Grid container spacing={2}>
-              {STAGE_COLORS &&
-                [
-                  { title: 'Section 4: SIA Notification', desc: 'Social Impact Assessment & Public Hearing', count: 184, lapseDays: 'N/A' },
-                  { title: 'Section 11: Preliminary Notification', desc: 'Summary of SIA published in District Gazette', count: 312, lapseDays: '12 Months to Sec 19' },
-                  { title: 'Section 15: Hearing of Objections', desc: '60-day inquiry window before Collector', count: 246, lapseDays: '60-day statutory bar' },
-                  { title: 'Section 19: Declaration of Acquisition', desc: 'Final declaration of land acquisition with R&R summary', count: 328, lapseDays: '12 Months to Sec 23' },
-                  { title: 'Section 23: Collector Award', desc: 'Determination of market value & 100% Solatium', count: 218, lapseDays: 'Sec 25 Final Lapse' },
-                  { title: 'Section 24: Physical Possession', desc: 'Handover of unencumbered site to Implementing Agency', count: 140, lapseDays: 'Completed' },
-                ].map((stg, i) => (
-                  <Grid item xs={12} sm={6} md={4} key={i}>
-                    <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 1, borderTop: `4px solid ${STAGE_COLORS[i]}`, bgcolor: '#ffffff' }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: STAGE_COLORS[i], fontSize: '0.72rem' }}>
-                          STAGE {i + 1}
-                        </Typography>
-                        <Chip label={`${stg.count} Corridors`} size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 800 }} />
-                      </Stack>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.84rem' }}>
-                        {stg.title}
+              {[
+                { title: 'Section 4: SIA Notification', desc: 'Social Impact Assessment & Public Hearing', count: 184, lapseDays: 'N/A' },
+                { title: 'Section 11: Preliminary Notification', desc: 'Summary of SIA published in District Gazette', count: 312, lapseDays: '12 Months to Sec 19' },
+                { title: 'Section 15: Hearing of Objections', desc: '60-day inquiry window before Collector', count: 246, lapseDays: '60-day statutory bar' },
+                { title: 'Section 19: Declaration of Acquisition', desc: 'Final declaration of land acquisition with R&R summary', count: 328, lapseDays: '12 Months to Sec 23' },
+                { title: 'Section 23: Collector Award', desc: 'Determination of market value & 100% Solatium', count: 218, lapseDays: 'Sec 25 Final Lapse' },
+                { title: 'Section 24: Physical Possession', desc: 'Handover of unencumbered site to Implementing Agency', count: 140, lapseDays: 'Completed' },
+              ].map((stg, i) => (
+                <Grid item xs={12} sm={6} md={4} key={i}>
+                  <Paper elevation={0} sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 1, borderTop: `4px solid ${STAGE_COLORS[i]}`, bgcolor: '#ffffff' }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: STAGE_COLORS[i], fontSize: '0.72rem' }}>
+                        STAGE {i + 1}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem', display: 'block', mb: 1 }}>
-                        {stg.desc}
-                      </Typography>
-                      <Chip label={`Clock: ${stg.lapseDays}`} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.62rem', borderColor: '#cbd5e1' }} />
-                    </Paper>
-                  </Grid>
-                ))}
+                      <Chip label={`${stg.count} Corridors`} size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 800 }} />
+                    </Stack>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.84rem' }}>
+                      {stg.title}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.72rem', display: 'block', mb: 1 }}>
+                      {stg.desc}
+                    </Typography>
+                    <Chip label={`Clock: ${stg.lapseDays}`} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.62rem', borderColor: '#cbd5e1' }} />
+                  </Paper>
+                </Grid>
+              ))}
             </Grid>
           </Box>
         )}
@@ -601,13 +753,13 @@ export default function LandAcquisitionHubPage() {
                         />
                       </TableCell>
                       <TableCell align="right" sx={{ py: 1, fontFamily: 'monospace', fontWeight: 700, fontSize: '0.78rem' }}>
-                        ₹{p.landOutlayCr}
+                        ₹{p.landOutlayCr.toLocaleString()}
                       </TableCell>
                       <TableCell align="right" sx={{ py: 1, fontFamily: 'monospace', fontWeight: 700, fontSize: '0.78rem', color: '#15803d' }}>
-                        ₹{p.compensationDisbursedCr}
+                        ₹{p.compensationDisbursedCr.toLocaleString()}
                       </TableCell>
                       <TableCell align="right" sx={{ py: 1, fontFamily: 'monospace', fontWeight: 700, fontSize: '0.78rem', color: '#d97706' }}>
-                        ₹{p.escrowBalanceCr}
+                        ₹{p.escrowBalanceCr.toLocaleString()}
                       </TableCell>
                       <TableCell align="center" sx={{ py: 1 }}>
                         <Box sx={{ width: 80, mx: 'auto' }}>

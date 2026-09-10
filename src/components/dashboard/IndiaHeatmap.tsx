@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, Typography, Tooltip as MuiTooltip, Box, Stack, Chip } from '@mui/material';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
-const INDIA_TOPO_URL = 'https://cdn.jsdelivr.net/npm/india-topojson@1.0.0/india.json';
+const INDIA_GEO_URL = '/india.json';
 
 // Simple color interpolation to replace d3-scale dependency
 function interpolateColor(c1: string, c2: string, t: number): string {
@@ -71,10 +71,10 @@ export default function IndiaHeatmap({ data }: IndiaHeatmapProps) {
               height={460}
               style={{ width: '100%', height: 'auto' }}
             >
-              <Geographies geography={INDIA_TOPO_URL}>
+              <Geographies geography={INDIA_GEO_URL}>
                 {({ geographies }) =>
                   geographies.map((geo) => {
-                    const rawName = (geo.properties.ST_NM || '').toLowerCase();
+                    const rawName = (geo.properties.st_nm || geo.properties.ST_NM || '').toLowerCase();
                     const cleanName = rawName.replace(/[^a-z0-9]/g, '');
                     const stateData =
                       dataMap.get(rawName) ||
@@ -96,10 +96,11 @@ export default function IndiaHeatmap({ data }: IndiaHeatmapProps) {
                         stroke="#cbd5e1"
                         strokeWidth={0.7}
                         onMouseEnter={() => {
+                          const displayName = geo.properties.st_nm || geo.properties.ST_NM || '';
                           setTooltipContent(
                             stateData
-                              ? `${geo.properties.ST_NM}: ${stateData.count} Projects • Avg Delay: ${stateData.avgDelay} Days`
-                              : geo.properties.ST_NM || '',
+                              ? `${displayName}: ${stateData.count} Projects • Avg Delay: ${stateData.avgDelay} Days`
+                              : displayName,
                           );
                         }}
                         onMouseLeave={() => setTooltipContent('')}
