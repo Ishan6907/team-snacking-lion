@@ -16,7 +16,7 @@ export interface RecommendationRequest {
 
 export interface RecommendationResponse {
   recommendations: string[];
-  source: 'gemini' | 'static';
+  source: 'gemini' | 'ai-predictive' | 'static';
   projectName: string;
 }
 

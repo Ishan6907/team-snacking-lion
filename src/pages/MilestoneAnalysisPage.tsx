@@ -210,7 +210,7 @@ export default function MilestoneAnalysisPage() {
   // Recommendations Logic
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [recsLoading, setRecsLoading] = useState(false);
-  const [recsSource, setRecsSource] = useState<'gemini' | 'static'>('static');
+  const [recsSource, setRecsSource] = useState<'gemini' | 'ai-predictive' | 'static'>('ai-predictive');
 
   const fetchRecommendations = async () => {
     setRecsLoading(true);
@@ -836,12 +836,13 @@ export default function MilestoneAnalysisPage() {
           <Stack direction="row" spacing={1} alignItems="center">
             {!recsLoading && recommendations.length > 0 && (
               <Chip 
-                label={recsSource === 'gemini' ? 'AI-Generated' : 'Rule-Based'} 
+                label={recsSource === 'gemini' ? 'AI-Generated (Gemini 2.0)' : recsSource === 'ai-predictive' ? 'AI-Predictive Engine' : 'Rule-Based'} 
                 size="small" 
                 sx={{ 
                   height: 20, fontSize: '0.62rem', fontWeight: 800,
-                  bgcolor: recsSource === 'gemini' ? '#dcfce7' : '#eff6ff', 
-                  color: recsSource === 'gemini' ? '#15803d' : '#0284c7'
+                  bgcolor: recsSource === 'gemini' ? '#dcfce7' : recsSource === 'ai-predictive' ? '#ecfdf5' : '#eff6ff', 
+                  color: recsSource === 'gemini' ? '#15803d' : recsSource === 'ai-predictive' ? '#047857' : '#0284c7',
+                  border: recsSource === 'gemini' || recsSource === 'ai-predictive' ? '1px solid #a7f3d0' : '1px solid #bfdbfe',
                 }} 
               />
             )}

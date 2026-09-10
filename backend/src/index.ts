@@ -1,6 +1,14 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from potential root or backend directories
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 
 import authRoutes from './routes/auth';
 import projectRoutes from './routes/projects';
