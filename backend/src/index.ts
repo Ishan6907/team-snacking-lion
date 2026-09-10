@@ -42,8 +42,11 @@ app.use('/api/v1/predictions', requireAuth, predictionRoutes);
 app.use('/api/v1/sectors', requireAuth, sectorRoutes);
 app.use('/api/v1/alerts', requireAuth, alertRoutes);
 app.use('/api/v1/recommendations', requireAuth, recommendationRoutes);
+import integrationRoutes from './routes/integrations';
+
 app.use('/api/v1/districts', requireAuth, districtRoutes);
 app.use('/api/v1/land-acquisition', requireAuth, landAcquisitionRoutes);
+app.use('/api/v1/integrations', requireAuth, integrationRoutes);
 
 // Analyst/Admin routes — require elevated permissions
 const requireAnalyst = requireRole('admin', 'analyst');
